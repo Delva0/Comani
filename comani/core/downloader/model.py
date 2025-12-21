@@ -16,7 +16,7 @@ import os
 import re
 import sys
 from dataclasses import dataclass
-from enum import StrEnum
+from enum import Enum
 from pathlib import Path
 from urllib.parse import urlparse, unquote
 
@@ -33,7 +33,7 @@ CHUNK_SIZE = 8192
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
 
 
-class DownloadType(StrEnum):
+class DownloadType(str, Enum):
     HF_REPO = "hf_repo"
     HF_FILE = "hf_file"
     CIVIT_FILE = "civit_file"
@@ -45,8 +45,7 @@ class DownloadItem:
     """Standardized download item with explicit type."""
     type: DownloadType
     url: str
-    filename: str | None = None
-    dirname: str | None = None  # for hf_repo
+    name: str | None = None  # filename for files, dirname for repos
 
 
 def detect_type(url: str) -> DownloadType:
@@ -91,11 +90,13 @@ def normalize_item(item: str | dict) -> DownloadItem:
     else:
         dtype = detect_type(url)
 
+    # Support both legacy 'filename'/'dirname' and new unified 'name'
+    name = item.get("name") or item.get("filename") or item.get("dirname")
+
     return DownloadItem(
         type=dtype,
         url=url,
-        filename=item.get("filename"),
-        dirname=item.get("dirname"),
+        name=name,
     )
 
 
@@ -115,7 +116,7 @@ def resolve_download(item: DownloadItem) -> ResolvedDownload | list[ResolvedDown
     match item.type:
         case DownloadType.HF_FILE:
             info = parse_hf_file_url(item.url)
-            filename = item.filename or info.filename
+            filename = item.name or info.filename
             return ResolvedDownload(info.download_url, filename, info.headers)
 
         case DownloadType.HF_REPO:
@@ -137,12 +138,12 @@ def resolve_download(item: DownloadItem) -> ResolvedDownload | list[ResolvedDown
 
         case DownloadType.CIVIT_FILE:
             info = parse_civitai_url(item.url)
-            filename = item.filename or info.filename
+            filename = item.name or info.filename
             return ResolvedDownload(info.download_url, filename, info.headers)
 
         case DownloadType.DIRECT_URL:
             parsed = urlparse(item.url)
-            filename = item.filename or unquote(parsed.path.split("/")[-1])
+            filename = item.name or unquote(parsed.path.split("/")[-1])
             return ResolvedDownload(item.url, filename, {})
 
 
@@ -282,7 +283,7 @@ def download_urls(
 
             if isinstance(resolved, list):
                 # hf_repo: download all files
-                dirname = item.dirname or item.url.split("/")[-1]
+                dirname = item.name or item.url.split("/")[-1]
                 base_dir = out_dir / dirname
                 for j, dl in enumerate(resolved, 1):
                     print(f"  [{j}/{len(resolved)}] {dl.filename}")
@@ -312,16 +313,3 @@ def download_yml(
 
     name = yml_path.stem
     download_urls(name, data, comfyui_root)
-
-
-def make_yml_download_func(yml_path: Path | str):
-    """
-    Create a download function for a yml file.
-    Example: download_artists = make_yml_download_func(DIR / "artists.yml")
-    """
-    yml_path = Path(yml_path)
-    def download(comfyui_root: Path | str | None = None) -> None:
-        download_yml(yml_path, comfyui_root)
-    download.__name__ = f"download_{yml_path.stem}"
-    download.__doc__ = f"Download models from {yml_path.name}"
-    return download

@@ -1,0 +1,9 @@
+diffusion_models:
+- name: z_image_turbo-Q5_K_M.gguf
+  url: https://huggingface.co/jayn7/Z-Image-Turbo-GGUF/blob/main/z_image_turbo-Q5_K_M.gguf
+text_encoders:
+- name: Qwen3-4B-UD-Q4_K_XL.gguf
+  url: https://huggingface.co/unsloth/Qwen3-4B-GGUF/blob/main/Qwen3-4B-UD-Q4_K_XL.gguf
+vae:
+- name: ae.safetensors
+  url: https://huggingface.co/Comfy-Org/z_image_turbo/blob/main/split_files/vae/ae.safetensors

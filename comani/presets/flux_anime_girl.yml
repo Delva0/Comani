@@ -1,0 +1,38 @@
+# Preset for anime girl generation using Flux workflow
+
+name: "Flux Anime Girl"
+base_workflow: "flux_dev_example.json"
+
+dependencies:
+  unet: "flux1-schnell.safetensors"
+  vae: "ae.safetensors"
+  clip_t5: "t5xxl_fp16.safetensors"
+  clip_l: "clip_l.safetensors"
+
+params:
+  positive_prompt: "cute anime girl with massive fluffy fennec ears, blonde messy long hair, blue eyes, maid outfit, 8k, masterpiece"
+  seed: 219670278747233
+  steps: 20
+  width: 1024
+  height: 1024
+  guidance: 3.5
+
+mapping:
+  positive_prompt:
+    node_id: "6"
+    field_path: "inputs.text"
+  seed:
+    node_id: "25"
+    field_path: "inputs.seed"
+  steps:
+    node_id: "17"
+    field_path: "inputs.steps"
+  width:
+    node_id: "34"
+    field_path: "inputs.value"
+  height:
+    node_id: "35"
+    field_path: "inputs.value"
+  guidance:
+    node_id: "26"
+    field_path: "inputs.guidance"

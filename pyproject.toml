@@ -30,6 +30,8 @@ Repository = "https://github.com/delva/comani"
 
 [project.scripts]
 comani-download-model = "comani.cli.download_model:main"
+comani-server = "comani.server:main"
+comani-mock-comfyui = "comani.mock_comfyui:main"
 
 [build-system]
 requires = ["hatchling"]

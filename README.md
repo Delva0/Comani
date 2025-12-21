@@ -128,6 +128,32 @@ comani-download-model comani/models/sdxl/loras/artists.yml
 python -m comani.models.sdxl.anikawa
 ```
 
+# Download Utilities
+
+This directory has been deprecated. The download logic has been reorganized:
+
+- **Model download**: `models/download.py`
+- **HuggingFace API**: `utils/hf/`
+- **Civitai API**: `utils/civitai/`
+
+## Usage Examples
+
+### Download models from YML file
+```bash
+python -m models.download misc.yml
+python -m models.download artists.yml --comfyui-root /path/to/ComfyUI
+```
+
+### Export Civitai collection to YML
+```bash
+# Export collection 6453691 with artist_ prefix
+python -m utils.civitai.collection 6453691 --export model --output artists.yml --prefix artist_
+
+# Export collection 106511 with slider_ prefix
+python -m utils.civitai.collection 106511 --export model --output sliders.yml --prefix slider_
+```
+
+
 ---
 
 ## Environment Variables

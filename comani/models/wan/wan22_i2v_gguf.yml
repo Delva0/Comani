@@ -1,0 +1,20 @@
+diffusion_models:
+- name: Wan2.2-I2V-A14B-HighNoise-Q4_K_M.gguf
+  url: https://huggingface.co/QuantStack/Wan2.2-I2V-A14B-GGUF/blob/main/HighNoise/Wan2.2-I2V-A14B-HighNoise-Q4_K_M.gguf
+- name: Wan2.2-I2V-A14B-LowNoise-Q4_K_M.gguf
+  url: https://huggingface.co/QuantStack/Wan2.2-I2V-A14B-GGUF/blob/main/LowNoise/Wan2.2-I2V-A14B-LowNoise-Q4_K_M.gguf
+text_encoders:
+- name: umt5_xxl_fp8_e4m3fn_scaled.safetensors
+  url: https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/blob/main/split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors
+vae:
+- name: wan_2.1_vae.safetensors
+  url: https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/blob/main/split_files/vae/wan_2.1_vae.safetensors
+loras:
+- name: Wan2.2-Lightning_I2V-A14B-4steps-lora_HIGH_fp16.safetensors
+  url: https://huggingface.co/Kijai/WanVideo_comfy/blob/main/LoRAs/Wan22-Lightning/old/Wan2.2-Lightning_I2V-A14B-4steps-lora_HIGH_fp16.safetensors
+- name: Wan2.2-Lightning_I2V-A14B-4steps-lora_LOW_fp16.safetensors
+  url: https://huggingface.co/Kijai/WanVideo_comfy/blob/main/LoRAs/Wan22-Lightning/old/Wan2.2-Lightning_I2V-A14B-4steps-lora_LOW_fp16.safetensors
+- name: NSFW-22-H-e8.safetensors
+  url: https://huggingface.co/lopi999/Wan2.2-I2V_General-NSFW-LoRA/blob/main/NSFW-22-H-e8.safetensors
+- name: NSFW-22-L-e8.safetensors
+  url: https://huggingface.co/lopi999/Wan2.2-I2V_General-NSFW-LoRA/blob/main/NSFW-22-L-e8.safetensors
