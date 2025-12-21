@@ -21,7 +21,7 @@ mapping:
     field_path: "inputs.text"
   seed:
     node_id: "25"
-    field_path: "inputs.seed"
+    field_path: "inputs.noise_seed"
   steps:
     node_id: "17"
     field_path: "inputs.steps"

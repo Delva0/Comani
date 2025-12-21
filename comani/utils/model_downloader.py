@@ -258,7 +258,7 @@ def _print_banner(name: str, action: str = "Downloading"):
     print("=" * 60)
 
 
-def download_urls(
+def download_spec(
     name: str,
     specs: dict[str, list[str | dict[str, str]]],
     comfyui_root: Path | str | None = None
@@ -312,4 +312,4 @@ def download_yml(
         return
 
     name = yml_path.stem
-    download_urls(name, data, comfyui_root)
+    download_spec(name, data, comfyui_root)

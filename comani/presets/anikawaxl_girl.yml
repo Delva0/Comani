@@ -1,0 +1,39 @@
+# Preset for anime girl using AniKawaXL
+
+name: "AniKawaXL Anime Girl"
+base_workflow: "anikawaxl.json"
+
+dependencies:
+  checkpoint: "anikawaxl_v2.safetensors"
+
+params:
+  positive_prompt: "1girl, cute anime girl, blue eyes, blonde hair, smile, looking at viewer, masterpiece, best quality"
+  negative_prompt: "worst quality, low quality, lowres, jpeg artifacts, blurry, deformed, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature"
+  seed: 123456789
+  steps: 28
+  cfg: 7.0
+  width: 1024
+  height: 1024
+
+mapping:
+  positive_prompt:
+    node_id: "2"
+    field_path: "inputs.text"
+  negative_prompt:
+    node_id: "3"
+    field_path: "inputs.text"
+  seed:
+    node_id: "5"
+    field_path: "inputs.seed"
+  steps:
+    node_id: "5"
+    field_path: "inputs.steps"
+  cfg:
+    node_id: "5"
+    field_path: "inputs.cfg"
+  width:
+    node_id: "4"
+    field_path: "inputs.width"
+  height:
+    node_id: "4"
+    field_path: "inputs.height"

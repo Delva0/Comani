@@ -1,0 +1,3 @@
+checkpoints:
+- name: boleromix_illustrious.safetensors
+  url: https://civitai.com/models/869634?modelVersionId=1412789

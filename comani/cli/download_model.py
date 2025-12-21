@@ -13,7 +13,7 @@ Usage:
 import sys
 from pathlib import Path
 
-from comani.core.downloader.model import download_yml
+from comani.utils.model_downloader import download_yml
 
 MODELS_ROOT = Path(__file__).parent.parent / "models"
 

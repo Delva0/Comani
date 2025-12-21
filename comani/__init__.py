@@ -8,7 +8,7 @@ from .config import get_config, init_config, ComaniConfig
 from .core.client import ComfyUIClient, ComfyUIResult
 from .core.preset import Preset, PresetManager
 from .core.executor import WorkflowLoader, Executor
-from .server import ComaniEngine, run_server
+from .core.engine import ComaniEngine
 
 __all__ = [
     "get_config",
@@ -21,5 +21,4 @@ __all__ = [
     "WorkflowLoader",
     "Executor",
     "ComaniEngine",
-    "run_server",
 ]

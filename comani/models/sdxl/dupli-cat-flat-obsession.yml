@@ -1,0 +1,3 @@
+checkpoints:
+- name: dupli-cat-flat-obsession-obs-v10-sdxl.safetensors
+  url: https://huggingface.co/John6666/dupli-cat-flat-obsession-obs-v10-sdxl
