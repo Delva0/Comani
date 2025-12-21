@@ -1,0 +1,56 @@
+[project]
+name = "comfy-anime-pack"
+version = "0.1.0"
+description = "Personal ComfyUI resource pack for anime-style image generation with VastAI integration"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+    { name = "delva" },
+    { name = "hy1004" }
+]
+keywords = ["comfyui", "anime", "stable-diffusion", "sdxl", "vastai"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Multimedia :: Graphics",
+]
+
+dependencies = [
+    "requests>=2.31.0",
+    "pyyaml>=6.0",
+    "tqdm>=4.66.0",
+]
+
+[project.urls]
+Repository = "https://github.com/delva/comfy-anime-pack"
+
+[project.scripts]
+comfy-anime-download = "comfy_anime_pack.models.download:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["comfy_anime_pack"]
+
+[tool.hatch.build.targets.wheel.sources]
+"comfy_anime_pack" = "comfy_anime_pack"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "comfy_anime_pack/**",
+    "scripts/**",
+    "workflows/**",
+    "tools/**",
+    "README.md",
+    "pyproject.toml",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "ruff>=0.8.0",
+]

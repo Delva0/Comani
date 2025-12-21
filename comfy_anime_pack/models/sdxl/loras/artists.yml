@@ -1,0 +1,399 @@
+loras:
+  - url: 'https://civitai.com/models/2219581'
+    filename: artist__10four_ILL.safetensors
+  - url: 'https://civitai.com/models/2216299'
+    filename: artist_sakutaro_39ar_39caILL.safetensors
+  - url: 'https://civitai.com/models/2211156'
+    filename: artist_ryonoILL.safetensors
+  - url: 'https://civitai.com/models/2211083'
+    filename: artist_kasahara_ijiILL.safetensors
+  - url: 'https://civitai.com/models/2211033'
+    filename: artist_amayouriILL.safetensors
+  - url: 'https://civitai.com/models/2210988'
+    filename: artist_REDUMILL.safetensors
+  - url: 'https://civitai.com/models/2192039'
+    filename: artist_RDJlockILL.safetensors
+  - url: 'https://civitai.com/models/2191037'
+    filename: artist_RellakinokoILL.safetensors
+  - url: 'https://civitai.com/models/2191007'
+    filename: artist_poipoipoitaILL.safetensors
+  - url: 'https://civitai.com/models/2189471'
+    filename: artist_PaulLaurenziILL.safetensors
+  - url: 'https://civitai.com/models/2189398'
+    filename: artist_052_saniiiwanILL.safetensors
+  - url: 'https://civitai.com/models/2189353'
+    filename: artist_0202aseILL.safetensors
+  - url: 'https://civitai.com/models/2189260'
+    filename: artist_kink_tortoiseshellILL.safetensors
+  - url: 'https://civitai.com/models/2189105'
+    filename: artist_uenomigiILL.safetensors
+  - url: 'https://civitai.com/models/2189066'
+    filename: artist_krokobyakaILL.safetensors
+  - url: 'https://civitai.com/models/2189009'
+    filename: artist_derpixonILL.safetensors
+  - url: 'https://civitai.com/models/2149356'
+    filename: artist_GilElvgrenPinupILL.safetensors
+  - url: 'https://civitai.com/models/2147659'
+    filename: artist_hexenccmILL.safetensors
+  - url: 'https://civitai.com/models/2147436'
+    filename: artist_OtisSweatILL.safetensors
+  - url: 'https://civitai.com/models/2146731'
+    filename: artist_imomononoILL.safetensors
+  - url: 'https://civitai.com/models/2146654'
+    filename: artist_MorryEvansILL.safetensors
+  - url: 'https://civitai.com/models/2146593'
+    filename: artist_AdamWarrenILL.safetensors
+  - url: 'https://civitai.com/models/2142017'
+    filename: artist_juzoh13_ILL.safetensors
+  - url: 'https://civitai.com/models/2114621'
+    filename: artist_optionaltypoILL.safetensors
+  - url: 'https://civitai.com/models/2111844'
+    filename: artist_MuldeokILL.safetensors
+  - url: 'https://civitai.com/models/2111625'
+    filename: artist_NeonGlowILL.safetensors
+  - url: 'https://civitai.com/models/2111577'
+    filename: artist_NeonLineartILL.safetensors
+  - url: 'https://civitai.com/models/2109786'
+    filename: artist_snowcandymagicILL.safetensors
+  - url: 'https://civitai.com/models/2102185'
+    filename: artist_GachiakutaILL.safetensors
+  - url: 'https://civitai.com/models/2098192'
+    filename: artist_GachiakutaMangaILL.safetensors
+  - url: 'https://civitai.com/models/2098036'
+    filename: artist_NightcrowingILL.safetensors
+  - url: 'https://civitai.com/models/2096377'
+    filename: artist_heikala_artILL.safetensors
+  - url: 'https://civitai.com/models/2085179'
+    filename: artist_Kaisen_TobiuoILL.safetensors
+  - url: 'https://civitai.com/models/2083724'
+    filename: artist_askziyeILL.safetensors
+  - url: 'https://civitai.com/models/2083639'
+    filename: artist_matata1203ILL.safetensors
+  - url: 'https://civitai.com/models/2083591'
+    filename: artist_Sangdelan_ILL.safetensors
+  - url: 'https://civitai.com/models/2081048'
+    filename: artist_quxf_ILL.safetensors
+  - url: 'https://civitai.com/models/2080907'
+    filename: artist_Yo_kitsuneILL.safetensors
+  - url: 'https://civitai.com/models/2072243'
+    filename: artist_RalphBakshiILL.safetensors
+  - url: 'https://civitai.com/models/2069656'
+    filename: artist_tonocha__ILL.safetensors
+  - url: 'https://civitai.com/models/2069232'
+    filename: artist_RetroShoujoMangaILL.safetensors
+  - url: 'https://civitai.com/models/2068355'
+    filename: artist_do___shi_ILL.safetensors
+  - url: 'https://civitai.com/models/2067697'
+    filename: artist_ta_u_laILL.safetensors
+  - url: 'https://civitai.com/models/2063789'
+    filename: artist_NigelGrazILL.safetensors
+  - url: 'https://civitai.com/models/2063763'
+    filename: artist_YenkurlILL.safetensors
+  - url: 'https://civitai.com/models/2061749'
+    filename: artist_mt5_014ILL.safetensors
+  - url: 'https://civitai.com/models/2061690'
+    filename: artist_U80x8Bltm00RqeoILL.safetensors
+  - url: 'https://civitai.com/models/2061386'
+    filename: artist_mmjtingILL.safetensors
+  - url: 'https://civitai.com/models/2061368'
+    filename: artist_NeoRu18436ILL.safetensors
+  - url: 'https://civitai.com/models/2058873'
+    filename: artist_fumio9361ILL.safetensors
+  - url: 'https://civitai.com/models/2054183'
+    filename: artist_kafunILL.safetensors
+  - url: 'https://civitai.com/models/2052968'
+    filename: artist_tsubonari_8ILL.safetensors
+  - url: 'https://civitai.com/models/2052852'
+    filename: artist_onoimokoILL.safetensors
+  - url: 'https://civitai.com/models/2051610'
+    filename: artist__Ax94gnILL.safetensors
+  - url: 'https://civitai.com/models/2051542'
+    filename: artist_starshadowmagicILL.safetensors
+  - url: 'https://civitai.com/models/2042275'
+    filename: artist_EllieMaplefoxILL.safetensors
+  - url: 'https://civitai.com/models/2041240'
+    filename: artist_godiva_ghoulILL.safetensors
+  - url: 'https://civitai.com/models/2040083'
+    filename: artist_The_BoondocksILL.safetensors
+  - url: 'https://civitai.com/models/2037021'
+    filename: artist_MohrbacherILL.safetensors
+  - url: 'https://civitai.com/models/2032547'
+    filename: artist_oyari_ashitoILLV2.safetensors
+  - url: 'https://civitai.com/models/2030453'
+    filename: artist_qing0ying0ILL.safetensors
+  - url: 'https://civitai.com/models/2030369'
+    filename: artist_matata1203ILL.safetensors
+  - url: 'https://civitai.com/models/2029033'
+    filename: artist_sorrownyILL.safetensors
+  - url: 'https://civitai.com/models/2027375'
+    filename: artist_KXBO99ILL.safetensors
+  - url: 'https://civitai.com/models/2019903'
+    filename: artist_shiratamahaILL.safetensors
+  - url: 'https://civitai.com/models/2019785'
+    filename: artist_N00dlesandwitchILL.safetensors
+  - url: 'https://civitai.com/models/1993846'
+    filename: artist_washanappleILL.safetensors
+  - url: 'https://civitai.com/models/1992381'
+    filename: artist_HongBsWsILL.safetensors
+  - url: 'https://civitai.com/models/1990482'
+    filename: artist_Nezt_OssILL.safetensors
+  - url: 'https://civitai.com/models/1989751'
+    filename: artist_mttsczILL.safetensors
+  - url: 'https://civitai.com/models/1989696'
+    filename: artist_lilbluubirdILL.safetensors
+  - url: 'https://civitai.com/models/1988021'
+    filename: artist_yuki12278947ILL.safetensors
+  - url: 'https://civitai.com/models/1976004'
+    filename: artist_mushi_aoiILL.safetensors
+  - url: 'https://civitai.com/models/1975963'
+    filename: artist_sarakipinILL.safetensors
+  - url: 'https://civitai.com/models/1966429'
+    filename: artist_hanataro_sruvhqkehy1ziedILL.safetensors
+  - url: 'https://civitai.com/models/1960562'
+    filename: artist_maidcousinILL.safetensors
+  - url: 'https://civitai.com/models/1958549'
+    filename: artist_douluo_daluILL.safetensors
+  - url: 'https://civitai.com/models/1957364'
+    filename: artist_nikulina-helenaILL.safetensors
+  - url: 'https://civitai.com/models/1954961'
+    filename: artist_DreamrotILL.safetensors
+  - url: 'https://civitai.com/models/1951630'
+    filename: artist_coconut_nekoparaILL.safetensors
+  - url: 'https://civitai.com/models/1949232'
+    filename: artist_harumakiILL.safetensors
+  - url: 'https://civitai.com/models/1949089'
+    filename: artist_DoodlelotILL.safetensors
+  - url: 'https://civitai.com/models/1947151'
+    filename: artist_kousei_mzILL.safetensors
+  - url: 'https://civitai.com/models/1941839'
+    filename: artist_sakiyama8maILL.safetensors
+  - url: 'https://civitai.com/models/1937570'
+    filename: artist_queasy_sILL.safetensors
+  - url: 'https://civitai.com/models/1936153'
+    filename: artist_david_nakayamaILL.safetensors
+  - url: 'https://civitai.com/models/1929952'
+    filename: artist_rexpoILL.safetensors
+  - url: 'https://civitai.com/models/1929911'
+    filename: artist_crrnILL.safetensors
+  - url: 'https://civitai.com/models/1926630'
+    filename: artist_pigeon666ILL.safetensors
+  - url: 'https://civitai.com/models/1923818'
+    filename: artist_yoneyama_maiILL.safetensors
+  - url: 'https://civitai.com/models/1917196'
+    filename: artist_HB_091ILL.safetensors
+  - url: 'https://civitai.com/models/1914633'
+    filename: artist_DaodttILL.safetensors
+  - url: 'https://civitai.com/models/1912044'
+    filename: artist_MossacannibalisILL.safetensors
+  - url: 'https://civitai.com/models/1904657'
+    filename: artist_illumi999ILL.safetensors
+  - url: 'https://civitai.com/models/1904512'
+    filename: artist_raichiyo33ILL.safetensors
+  - url: 'https://civitai.com/models/1902644'
+    filename: artist_Lhata4564ILL.safetensors
+  - url: 'https://civitai.com/models/1902500'
+    filename: artist_GharlieraILL.safetensors
+  - url: 'https://civitai.com/models/1901941'
+    filename: artist_PlayzholderILL.safetensors
+  - url: 'https://civitai.com/models/1869132'
+    filename: artist_KPopDemonHuntersILL.safetensors
+  - url: 'https://civitai.com/models/1869055'
+    filename: artist_KPopDemonHuntersChibiStyleILL.safetensors
+  - url: 'https://civitai.com/models/1868699'
+    filename: artist_pnvickyILL.safetensors
+  - url: 'https://civitai.com/models/1868071'
+    filename: artist_OsididILL.safetensors
+  - url: 'https://civitai.com/models/1848547'
+    filename: artist_kangyannanILL.safetensors
+  - url: 'https://civitai.com/models/1845769'
+    filename: artist_PhiltomatoILL.safetensors
+  - url: 'https://civitai.com/models/1845358'
+    filename: artist_lvl374ILL.safetensors
+  - url: 'https://civitai.com/models/1843071'
+    filename: artist_yottasunILL.safetensors
+  - url: 'https://civitai.com/models/1828159'
+    filename: artist_TarokunnnnILL.safetensors
+  - url: 'https://civitai.com/models/1826595'
+    filename: artist_PetravoiceILL.safetensors
+  - url: 'https://civitai.com/models/1826532'
+    filename: artist_M7radiogalaxyILL.safetensors
+  - url: 'https://civitai.com/models/1825270'
+    filename: artist_PeterPanRetroStyleILL.safetensors
+  - url: 'https://civitai.com/models/1810262'
+    filename: artist_VinneartILL.safetensors
+  - url: 'https://civitai.com/models/1810203'
+    filename: artist_ArtDecoILL.safetensors
+  - url: 'https://civitai.com/models/1770349'
+    filename: artist_GuelStyleILL.safetensors
+  - url: 'https://civitai.com/models/1758935'
+    filename: artist_RetroGothicAnimeILL.safetensors
+  - url: 'https://civitai.com/models/1755296'
+    filename: artist_shirow_masamuneILL.safetensors
+  - url: 'https://civitai.com/models/1754356'
+    filename: artist_chakiaiha0315ILL.safetensors
+  - url: 'https://civitai.com/models/1735525'
+    filename: artist_suzuhira_hiroILL.safetensors
+  - url: 'https://civitai.com/models/1718535'
+    filename: artist_NasukiChanILL.safetensors
+  - url: 'https://civitai.com/models/306493'
+    filename: artist_OGVixonStyleILL.safetensors
+  - url: 'https://civitai.com/models/1681220'
+    filename: artist_BiscuitCakeILL.safetensors
+  - url: 'https://civitai.com/models/1660720'
+    filename: artist_RuinedBeautyILL.safetensors
+  - url: 'https://civitai.com/models/1651489'
+    filename: artist_kawarajima_kouILL.safetensors
+  - url: 'https://civitai.com/models/1651431'
+    filename: artist_Dark_Souls_Elden_RingILL.safetensors
+  - url: 'https://civitai.com/models/1648940'
+    filename: artist_neon_genesis_evangelionILL.safetensors
+  - url: 'https://civitai.com/models/1647813'
+    filename: artist_VampirellaILL.safetensors
+  - url: 'https://civitai.com/models/1645773'
+    filename: artist_GregStaplesILL.safetensors
+  - url: 'https://civitai.com/models/1632702'
+    filename: artist_aelion_drawsILL.safetensors
+  - url: 'https://civitai.com/models/1632591'
+    filename: artist_chuu0105ILL.safetensors
+  - url: 'https://civitai.com/models/1631488'
+    filename: artist_hiroyuki_takahashiILL.safetensors
+  - url: 'https://civitai.com/models/1631408'
+    filename: artist_soranamaeILL.safetensors
+  - url: 'https://civitai.com/models/1626827'
+    filename: artist_yuekoILL.safetensors
+  - url: 'https://civitai.com/models/1626688'
+    filename: artist_gdbeeartILL.safetensors
+  - url: 'https://civitai.com/models/1607778'
+    filename: artist_messydigitalpaintingILL.safetensors
+  - url: 'https://civitai.com/models/1586129'
+    filename: artist_DreamcoreNeonILL.safetensors
+  - url: 'https://civitai.com/models/1566720'
+    filename: artist_Humberto_RamosILL.safetensors
+  - url: 'https://civitai.com/models/1558671'
+    filename: artist_LostInYourDreamsILL.safetensors
+  - url: 'https://civitai.com/models/1532409'
+    filename: artist_Magali_VilleneuveILL.safetensors
+  - url: 'https://civitai.com/models/1528245'
+    filename: artist_CowboyBebopILL.safetensors
+  - url: 'https://civitai.com/models/1478198'
+    filename: artist_hara_id_21ILL.safetensors
+  - url: 'https://civitai.com/models/1478082'
+    filename: artist_projecttigerILL.safetensors
+  - url: 'https://civitai.com/models/1432053'
+    filename: artist_windows_98ILL.safetensors
+  - url: 'https://civitai.com/models/1431705'
+    filename: artist_PfpCircleILL.safetensors
+  - url: 'https://civitai.com/models/1430493'
+    filename: artist_south_parkILL.safetensors
+  - url: 'https://civitai.com/models/1428495'
+    filename: artist_FeelingBlueILL.safetensors
+  - url: 'https://civitai.com/models/1425630'
+    filename: artist_CutecoreDecoraILL.safetensors
+  - url: 'https://civitai.com/models/1425358'
+    filename: artist_FireandIceILL.safetensors
+  - url: 'https://civitai.com/models/1416735'
+    filename: artist_studio_ghibliILL.safetensors
+  - url: 'https://civitai.com/models/1414247'
+    filename: artist_high_detailILL.safetensors
+  - url: 'https://civitai.com/models/1413049'
+    filename: artist_TheWorldIsRedILL.safetensors
+  - url: 'https://civitai.com/models/1409488'
+    filename: artist_SilentHillStyleILL.safetensors
+  - url: 'https://civitai.com/models/1402494'
+    filename: artist_WedillustILL.safetensors
+  - url: 'https://civitai.com/models/1396473'
+    filename: artist_beachghost_ILL.safetensors
+  - url: 'https://civitai.com/models/1390342'
+    filename: artist_RaymondSwanlandILL.safetensors
+  - url: 'https://civitai.com/models/1384472'
+    filename: artist_kodokuILL.safetensors
+  - url: 'https://civitai.com/models/1348268'
+    filename: artist_TheLastUnicornILL.safetensors
+  - url: 'https://civitai.com/models/1310041'
+    filename: artist_GloomILL.safetensors
+  - url: 'https://civitai.com/models/1309761'
+    filename: artist_CreepyCuteILL.safetensors
+  - url: 'https://civitai.com/models/1300388'
+    filename: artist_PastelILL.safetensors
+  - url: 'https://civitai.com/models/1293445'
+    filename: artist_GustavKlimtILL.safetensors
+  - url: 'https://civitai.com/models/1292294'
+    filename: artist_WhiteNegativeSpaceILL.safetensors
+  - url: 'https://civitai.com/models/1270176'
+    filename: artist_TrippyILL.safetensors
+  - url: 'https://civitai.com/models/1267736'
+    filename: artist_RichardKaneFergusonILL.safetensors
+  - url: 'https://civitai.com/models/1266842'
+    filename: artist_PhantomILL.safetensors
+  - url: 'https://civitai.com/models/1252804'
+    filename: artist_dino_dinoartforameILL.safetensors
+  - url: 'https://civitai.com/models/1256161'
+    filename: artist_GhostlyWhiteILL.safetensors
+  - url: 'https://civitai.com/models/1230296'
+    filename: artist_BlueOutlineDigILL.safetensors
+  - url: 'https://civitai.com/models/1229102'
+    filename: artist_ExpressiveDetailedArtILL.safetensors
+  - url: 'https://civitai.com/models/1229238'
+    filename: artist_FPLILL.safetensors
+  - url: 'https://civitai.com/models/1226909'
+    filename: artist_DOPILL.safetensors
+  - url: 'https://civitai.com/models/1207565'
+    filename: artist_SpiralingThoughtsILL.safetensors
+  - url: 'https://civitai.com/models/1207443'
+    filename: artist_ThermalSwirlsILL.safetensors
+  - url: 'https://civitai.com/models/1182038'
+    filename: artist_NightjarIllustrationILL.safetensors
+  - url: 'https://civitai.com/models/1153804'
+    filename: artist_zigouILL.safetensors
+  - url: 'https://civitai.com/models/1145793'
+    filename: artist_waynereynoldsILL.safetensors
+  - url: 'https://civitai.com/models/1141459'
+    filename: artist_chuhaibaneILL.safetensors
+  - url: 'https://civitai.com/models/1141369'
+    filename: artist_HaruwosiILL.safetensors
+  - url: 'https://civitai.com/models/1141257'
+    filename: artist_HharuILL.safetensors
+  - url: 'https://civitai.com/models/1141121'
+    filename: artist_mucknagabeILL.safetensors
+  - url: 'https://civitai.com/models/1140962'
+    filename: artist_DanDeCarloILL.safetensors
+  - url: 'https://civitai.com/models/1130279'
+    filename: artist_DetailedPixelArtILL.safetensors
+  - url: 'https://civitai.com/models/1112934'
+    filename: artist_OilPaintingILL.safetensors
+  - url: 'https://civitai.com/models/1102308'
+    filename: artist_WiresandtreesILL.safetensors
+  - url: 'https://civitai.com/models/1036791'
+    filename: artist_SebMcKinnonILL.safetensors
+  - url: 'https://civitai.com/models/1031526'
+    filename: artist_dandadanILL.safetensors
+  - url: 'https://civitai.com/models/1030028'
+    filename: artist_auroraborealisILL2.safetensors
+  - url: 'https://civitai.com/models/1026983'
+    filename: artist_backlitILL.safetensors
+  - url: 'https://civitai.com/models/1023889'
+    filename: artist_TsutomuNiheiV2ILL.safetensors
+  - url: 'https://civitai.com/models/1023811'
+    filename: artist_Junji_Ito_ArtbookILL.safetensors
+  - url: 'https://civitai.com/models/1023711'
+    filename: artist_prismlightILL.safetensors
+  - url: 'https://civitai.com/models/1020696'
+    filename: artist_DappledSunlightILL.safetensors
+  - url: 'https://civitai.com/models/1020650'
+    filename: artist_ProjectionLightingILL.safetensors
+  - url: 'https://civitai.com/models/1020632'
+    filename: artist_WarmLightingILL.safetensors
+  - url: 'https://civitai.com/models/1020556'
+    filename: artist_VenetianLightingILL.safetensors
+  - url: 'https://civitai.com/models/1020411'
+    filename: artist_GOBOLightingILL.safetensors
+  - url: 'https://civitai.com/models/1011811'
+    filename: artist_fennerILL.safetensors
+  - url: 'https://civitai.com/models/1008090'
+    filename: artist_suzukasuraimuILL.safetensors
+  - url: 'https://civitai.com/models/1006603'
+    filename: artist_suzushiroILL.safetensors
+  - url: 'https://civitai.com/models/1003333'
+    filename: artist_g0thicILL3.safetensors
+  - url: 'https://civitai.com/models/1003190'
+    filename: artist_sattanILL.safetensors

@@ -1,0 +1,160 @@
+# Comfy Anime Pack
+
+Personal ComfyUI resource pack for anime-style image generation, optimized for VastAI GPU instances.
+
+## Installation
+
+```bash
+# Install from source
+pip install -e .
+
+# Or install directly
+pip install git+https://github.com/delva/comfy-anime-pack.git
+```
+
+## CLI Usage
+
+```bash
+# Download models from YML file
+comfy-anime-download models/sdxl/loras/artists.yml --comfyui-root /path/to/ComfyUI
+
+# Or use Python module
+python -m comfy_anime_pack.models.download models/sdxl/loras/misc.yml
+```
+
+## VastAI x ComfyUI Quick Start
+
+### 1. Rent GPU Instance
+
+- **GPU**: 4096+ VRAM × 1
+- **Sort**: by price
+- **Exclude**: HK region
+
+### 2. Template Settings
+
+- **Template**: SSH Container / ComfyUI Template / Ubuntu Desktop Container
+- **Disk**: 100G
+- **Expose Ports**: 8188, 8080
+
+### 3. Connect via SSH
+
+```bash
+export SERVER_IP=<your_server_ip> SERVER_PORT=<your_ssh_port>
+
+# Connect with port forwarding
+ssh -p "${SERVER_PORT}" "root@${SERVER_IP}" -L 8080:localhost:8080
+```
+
+> **Tip**: Enable tmux mouse scroll: `Ctrl+b` then `:set -g mouse on`
+
+### 4. Install ComfyUI (Skip if using ComfyUI template)
+
+```bash
+pip install comfy-cli
+comfy --workspace /workspace/ComfyUI install
+```
+
+### 5. Start ComfyUI
+
+```bash
+cd /workspace/ComfyUI
+python main.py --listen 0.0.0.0 --multi-user
+```
+
+> **Note**: If using Jupyter SSH, kill existing process first: `pkill -f python`
+
+Access via browser: `http://<SERVER_IP>:8188`
+
+---
+
+## Resource Sync
+
+### Push Local → Remote
+
+```bash
+export SERVER_IP=<ip> SERVER_PORT=<port>
+
+# Option 1: Use the provided script
+cd /path/to/comfy-anime-pack
+./scripts/push.sh
+
+# Option 2: Manual rsync
+rsync -avz --delete -e "ssh -p $SERVER_PORT" \
+  ./ root@$SERVER_IP:/workspace/ComfyUI/comfy_anime_pack/
+
+# Fix permissions on remote
+ssh -p $SERVER_PORT root@$SERVER_IP "chown -R root:root /workspace/ComfyUI/comfy_anime_pack"
+```
+
+### Pull Remote → Local
+
+```bash
+export SERVER_IP=<ip> SERVER_PORT=<port>
+
+# Option 1: Use the provided script
+cd /path/to/comfy-anime-pack
+./scripts/pull.sh
+
+# Option 2: Manual rsync
+rsync -avz --delete -e "ssh -p $SERVER_PORT" \
+  root@$SERVER_IP:/workspace/ComfyUI/comfy_anime_pack/ .
+```
+
+---
+
+## Remote Setup Scripts
+
+### Copy Workflows
+
+```bash
+# On remote server
+./scripts/remote/copy-workflows.sh
+
+# Or manually
+mkdir -p /workspace/ComfyUI/user/default/workflows
+cp workflows/*.json /workspace/ComfyUI/user/default/workflows
+```
+
+### Download Models
+
+```bash
+export CIVITAI_API_TOKEN=<your_token>
+export HF_API_TOKEN=<your_token>
+
+# Using CLI
+comfy-anime-download comfy_anime_pack/models/sdxl/loras/artists.yml
+
+# Or using Python script directly
+python -m comfy_anime_pack.models.sdxl.anikawa
+```
+
+---
+
+## Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `COMFYUI_ROOT` | ComfyUI installation directory | `/workspace/ComfyUI` |
+| `CIVITAI_API_TOKEN` | Civitai API token for model downloads | - |
+| `HF_API_TOKEN` | HuggingFace API token | - |
+| `SERVER_IP` | Remote server IP for sync scripts | - |
+| `SERVER_PORT` | Remote server SSH port for sync scripts | - |
+
+---
+
+## Project Structure
+
+```
+comfy-anime-pack/
+├── comfy_anime_pack/    # Main Python package
+│   ├── models/          # Model download scripts
+│   │   ├── sdxl/        # SDXL checkpoints & LoRAs
+│   │   ├── upscale/     # Upscaler models
+│   │   ├── wan/         # WAN models
+│   │   └── zimage/      # Image processing models
+│   └── utils/           # Utilities (civitai, hf downloaders)
+├── scripts/             # Automation scripts
+├── tools/               # Additional tools
+├── workflows/           # ComfyUI workflow JSONs
+└── pyproject.toml       # Package configuration
+```
