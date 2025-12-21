@@ -1,5 +1,5 @@
 #!/bin/bash
-# Pull remote comfy_anime_pack from VastAI instance with backup
+# Pull remote comani from VastAI instance with backup
 
 set -e
 
@@ -10,9 +10,9 @@ if [ -z "$SERVER_IP" ] || [ -z "$SERVER_PORT" ]; then
 fi
 
 # Use environment variable or default to current directory
-LOCAL_DIR="${COMFY_ANIME_PACK_LOCAL:-$(pwd)}"
+LOCAL_DIR="${COMANI_LOCAL:-$(pwd)}"
 BACKUP_DIR="${LOCAL_DIR}-old"
-REMOTE_DIR="${COMFY_ANIME_PACK_REMOTE:-root@$SERVER_IP:/workspace/ComfyUI/comfy_anime_pack/}"
+REMOTE_DIR="${COMANI_REMOTE:-root@$SERVER_IP:/workspace/ComfyUI/comani/}"
 
 cd "$LOCAL_DIR"
 

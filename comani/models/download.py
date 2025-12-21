@@ -9,10 +9,10 @@ Supported types:
   - direct_url: Direct download from any URL
 
 Usage:
-  comfy-anime-download <yml_file> [--comfyui-root PATH]
-  python -m comfy_anime_pack.models.download <yml_file> [--comfyui-root PATH]
+  python -m comani.models.download <yml_file> [--comfyui-root PATH]
 """
 import argparse
+import os
 import re
 import sys
 from dataclasses import dataclass
@@ -24,8 +24,8 @@ import requests
 import yaml
 from tqdm import tqdm
 
-from comfy_anime_pack.utils.hf import parse_hf_file_url, list_repo_files, get_auth_headers as get_hf_headers
-from comfy_anime_pack.utils.civitai import parse_civitai_url
+from comani.utils.hf import parse_hf_file_url, list_repo_files, get_auth_headers as get_hf_headers
+from comani.utils.civitai import parse_civitai_url
 
 # Constants
 REQUEST_TIMEOUT = 30
@@ -239,8 +239,13 @@ def download_url(url: str, out_path: str | Path, headers: dict | None = None) ->
 # ============================================================================
 
 def _resolve_models_dir(comfyui_root: Path | str | None = None) -> Path:
-    """Resolve ComfyUI models directory."""
-    root = comfyui_root or Path("/workspace/ComfyUI")
+    """
+    Resolve ComfyUI models directory.
+    Priority: argument > COMFY_UI_DIR env var > default /workspace/ComfyUI.
+    """
+    root = comfyui_root or os.environ.get("COMFY_UI_DIR")# or "/workspace/ComfyUI"
+    if not root:
+        raise ValueError("COMFY_UI_DIR environment variable is not set")
     root = Path(root).resolve()
     print(f"ComfyUI root: {root}")
     return root / "models"
@@ -252,7 +257,7 @@ def _print_banner(name: str, action: str = "Downloading"):
     print("=" * 60)
 
 
-def run_download_urls(
+def download_urls(
     name: str,
     specs: dict[str, list[str | dict[str, str]]],
     comfyui_root: Path | str | None = None
@@ -290,7 +295,7 @@ def run_download_urls(
     print("=" * 60)
 
 
-def run_download_yml(
+def download_yml(
     yml_path: Path,
     comfyui_root: Path | str | None = None
 ) -> None:
@@ -306,76 +311,17 @@ def run_download_yml(
         return
 
     name = yml_path.stem
-    run_download_urls(name, data, comfyui_root)
+    download_urls(name, data, comfyui_root)
 
 
-def run_download_repo(
-    name: str,
-    repo: str,
-    target: str = "diffusers",
-    download_dir: str | None = None,
-    skip: set[str] | None = None,
-    comfyui_root: Path | str | None = None
-) -> None:
+def make_yml_download_func(yml_path: Path | str):
     """
-    Download entire HuggingFace repo.
-    Example: run_download_repo("Model Name", "user/repo-name", download_dir="custom-dir")
+    Create a download function for a yml file.
+    Example: download_artists = make_yml_download_func(DIR / "artists.yml")
     """
-    models_dir = _resolve_models_dir(comfyui_root)
-    _print_banner(name)
-
-    dir_name = download_dir or repo.split("/")[-1]
-    files = list_repo_files(repo, skip)
-    if not files:
-        raise RuntimeError(f"No files found in repo: {repo}")
-
-    out_base = models_dir / target / dir_name
-    headers = get_hf_headers()
-
-    print(f"Repo: {repo}")
-    print(f"Target: {out_base}")
-    print(f"Files: {len(files)}")
-
-    for i, file_path in enumerate(files, 1):
-        url = f"https://huggingface.co/{repo}/resolve/main/{file_path}"
-        out_path = out_base / file_path
-        print(f"\n[{i}/{len(files)}] {file_path}")
-        download_url(url, out_path, headers)
-
-    print(f"\n{'=' * 60}")
-    print(f"{name} download complete!")
-    print("=" * 60)
-
-
-# ============================================================================
-# CLI entry point
-# ============================================================================
-
-def main():
-    parser = argparse.ArgumentParser(
-        description="Download models from YML config file.",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  comfy-anime-download misc.yml
-  comfy-anime-download artists.yml --comfyui-root /path/to/ComfyUI
-        """,
-    )
-    parser.add_argument("yml_file", type=Path, help="YML file with model URLs")
-    parser.add_argument(
-        "--comfyui-root",
-        type=Path,
-        default=None,
-        help="ComfyUI root directory (default: /workspace/ComfyUI)",
-    )
-    args = parser.parse_args()
-
-    if not args.yml_file.exists():
-        print(f"Error: File not found: {args.yml_file}")
-        sys.exit(1)
-
-    run_download_yml(args.yml_file, args.comfyui_root)
-
-
-if __name__ == "__main__":
-    main()
+    yml_path = Path(yml_path)
+    def download(comfyui_root: Path | str | None = None) -> None:
+        download_yml(yml_path, comfyui_root)
+    download.__name__ = f"download_{yml_path.stem}"
+    download.__doc__ = f"Download models from {yml_path.name}"
+    return download

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Push local comfy_anime_pack to remote VastAI instance
+# Push local comani to remote VastAI instance
 
 set -e
 
@@ -10,13 +10,13 @@ if [ -z "$SERVER_IP" ] || [ -z "$SERVER_PORT" ]; then
 fi
 
 # Use environment variable or default to current directory
-LOCAL_DIR="${COMFY_ANIME_PACK_LOCAL:-$(pwd)/}"
-REMOTE_DIR="${COMFY_ANIME_PACK_REMOTE:-root@$SERVER_IP:/workspace/ComfyUI/comfy_anime_pack/}"
+LOCAL_DIR="${COMANI_LOCAL:-$(pwd)/}"
+REMOTE_DIR="${COMANI_REMOTE:-root@$SERVER_IP:/workspace/ComfyUI/comani/}"
 
 echo "Pushing to $SERVER_IP:$SERVER_PORT..."
 rsync -avz --delete -e "ssh -p $SERVER_PORT" "$LOCAL_DIR" "$REMOTE_DIR"
 
 echo "Fixing permissions..."
-ssh -p "$SERVER_PORT" "root@$SERVER_IP" "chown -R root:root /workspace/ComfyUI/comfy_anime_pack"
+ssh -p "$SERVER_PORT" "root@$SERVER_IP" "chown -R root:root /workspace/ComfyUI/comani"
 
 echo "Done!"

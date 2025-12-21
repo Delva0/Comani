@@ -4,7 +4,7 @@
 set -e
 
 COMFYUI_ROOT="${COMFYUI_ROOT:-/workspace/ComfyUI}"
-PACK_DIR="${COMFY_ANIME_PACK_DIR:-$COMFYUI_ROOT/comfy_anime_pack}"
+PACK_DIR="${COMANI_DIR:-$COMFYUI_ROOT/comani}"
 WORKFLOW_DIR="$COMFYUI_ROOT/user/default/workflows"
 
 mkdir -p "$WORKFLOW_DIR"

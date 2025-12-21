@@ -1,4 +1,4 @@
-# Comfy Anime Pack
+# Comani
 
 Personal ComfyUI resource pack for anime-style image generation, optimized for VastAI GPU instances.
 
@@ -9,17 +9,17 @@ Personal ComfyUI resource pack for anime-style image generation, optimized for V
 pip install -e .
 
 # Or install directly
-pip install git+https://github.com/delva/comfy-anime-pack.git
+pip install git+https://github.com/delva/comani.git
 ```
 
 ## CLI Usage
 
 ```bash
 # Download models from YML file
-comfy-anime-download models/sdxl/loras/artists.yml --comfyui-root /path/to/ComfyUI
+comani-download-model models/sdxl/loras/artists.yml --comfyui-root /path/to/ComfyUI
 
 # Or use Python module
-python -m comfy_anime_pack.models.download models/sdxl/loras/misc.yml
+python -m comani.models.download models/sdxl/loras/misc.yml
 ```
 
 ## VastAI x ComfyUI Quick Start
@@ -75,15 +75,15 @@ Access via browser: `http://<SERVER_IP>:8188`
 export SERVER_IP=<ip> SERVER_PORT=<port>
 
 # Option 1: Use the provided script
-cd /path/to/comfy-anime-pack
+cd /path/to/comani
 ./scripts/push.sh
 
 # Option 2: Manual rsync
 rsync -avz --delete -e "ssh -p $SERVER_PORT" \
-  ./ root@$SERVER_IP:/workspace/ComfyUI/comfy_anime_pack/
+  ./ root@$SERVER_IP:/workspace/ComfyUI/comani/
 
 # Fix permissions on remote
-ssh -p $SERVER_PORT root@$SERVER_IP "chown -R root:root /workspace/ComfyUI/comfy_anime_pack"
+ssh -p $SERVER_PORT root@$SERVER_IP "chown -R root:root /workspace/ComfyUI/comani"
 ```
 
 ### Pull Remote → Local
@@ -92,12 +92,12 @@ ssh -p $SERVER_PORT root@$SERVER_IP "chown -R root:root /workspace/ComfyUI/comfy
 export SERVER_IP=<ip> SERVER_PORT=<port>
 
 # Option 1: Use the provided script
-cd /path/to/comfy-anime-pack
+cd /path/to/comani
 ./scripts/pull.sh
 
 # Option 2: Manual rsync
 rsync -avz --delete -e "ssh -p $SERVER_PORT" \
-  root@$SERVER_IP:/workspace/ComfyUI/comfy_anime_pack/ .
+  root@$SERVER_IP:/workspace/ComfyUI/comani/ .
 ```
 
 ---
@@ -122,10 +122,10 @@ export CIVITAI_API_TOKEN=<your_token>
 export HF_API_TOKEN=<your_token>
 
 # Using CLI
-comfy-anime-download comfy_anime_pack/models/sdxl/loras/artists.yml
+comani-download-model comani/models/sdxl/loras/artists.yml
 
 # Or using Python script directly
-python -m comfy_anime_pack.models.sdxl.anikawa
+python -m comani.models.sdxl.anikawa
 ```
 
 ---
@@ -139,22 +139,3 @@ python -m comfy_anime_pack.models.sdxl.anikawa
 | `HF_API_TOKEN` | HuggingFace API token | - |
 | `SERVER_IP` | Remote server IP for sync scripts | - |
 | `SERVER_PORT` | Remote server SSH port for sync scripts | - |
-
----
-
-## Project Structure
-
-```
-comfy-anime-pack/
-├── comfy_anime_pack/    # Main Python package
-│   ├── models/          # Model download scripts
-│   │   ├── sdxl/        # SDXL checkpoints & LoRAs
-│   │   ├── upscale/     # Upscaler models
-│   │   ├── wan/         # WAN models
-│   │   └── zimage/      # Image processing models
-│   └── utils/           # Utilities (civitai, hf downloaders)
-├── scripts/             # Automation scripts
-├── tools/               # Additional tools
-├── workflows/           # ComfyUI workflow JSONs
-└── pyproject.toml       # Package configuration
-```

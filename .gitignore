@@ -1,3 +1,7 @@
+# Dev
+playground/
+codebase.md
+
 # Python
 __pycache__/
 *.py[cod]
@@ -48,4 +52,3 @@ Thumbs.db
 *.pth
 *.gguf
 *.onnx
-
