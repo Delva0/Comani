@@ -1,3 +1,0 @@
-checkpoints:
-- name: plant_milk.safetensors
-  url: https://civitai.com/api/download/models/1714314?type=Model&format=SafeTensor&size=pruned&fp=fp16

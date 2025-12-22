@@ -18,13 +18,13 @@ from typing import Iterable, Iterator
 
 import streamlit as st
 
-from comani.models.download import (
+from comani.utils.model_downloader import (
     DownloadItem,
     detect_type,
     download_url,
     resolve_download,
-    _resolve_models_dir,
 )
+from comani.core.downloader import ModelDownloader
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -242,7 +242,8 @@ def next_copy_path() -> Path:
 def download_entries(entries: list[Entry], comfyui_root: str | Path) -> None:
     comfyui_root = Path(comfyui_root)
     try:
-        models_dir = _resolve_models_dir(comfyui_root)
+        downloader = ModelDownloader(comfyui_root)
+        models_dir = downloader.models_dir
     except Exception as exc:
         st.error(f"解析 COMFYUI_DIR 失败: {exc}")
         return
@@ -264,8 +265,7 @@ def download_entries(entries: list[Entry], comfyui_root: str | Path) -> None:
         item = DownloadItem(
             type=detect_type(entry.url),
             url=entry.url,
-            filename=target_path.name,
-            dirname=target_path.name if target_path.suffix == "" else None,
+            name=target_path.name,
         )
         resolved = resolve_download(item)
         if isinstance(resolved, list):

@@ -1,0 +1,598 @@
+models:
+  artist_10four_ill:
+    url: https://civitai.com/models/2219581
+    path: models/loras/artist_10four_ILL.safetensors
+  artist_sakutaro_39ar_39caill:
+    url: https://civitai.com/models/2216299
+    path: models/loras/artist_sakutaro_39ar_39caILL.safetensors
+  artist_ryonoill:
+    url: https://civitai.com/models/2211156
+    path: models/loras/artist_ryonoILL.safetensors
+  artist_kasahara_ijiill:
+    url: https://civitai.com/models/2211083
+    path: models/loras/artist_kasahara_ijiILL.safetensors
+  artist_amayouriill:
+    url: https://civitai.com/models/2211033
+    path: models/loras/artist_amayouriILL.safetensors
+  artist_redumill:
+    url: https://civitai.com/models/2210988
+    path: models/loras/artist_REDUMILL.safetensors
+  artist_rdjlockill:
+    url: https://civitai.com/models/2192039
+    path: models/loras/artist_RDJlockILL.safetensors
+  artist_rellakinokoill:
+    url: https://civitai.com/models/2191037
+    path: models/loras/artist_RellakinokoILL.safetensors
+  artist_poipoipoitaill:
+    url: https://civitai.com/models/2191007
+    path: models/loras/artist_poipoipoitaILL.safetensors
+  artist_paullaurenziill:
+    url: https://civitai.com/models/2189471
+    path: models/loras/artist_PaulLaurenziILL.safetensors
+  artist_052_saniiiwanill:
+    url: https://civitai.com/models/2189398
+    path: models/loras/artist_052_saniiiwanILL.safetensors
+  artist_0202aseill:
+    url: https://civitai.com/models/2189353
+    path: models/loras/artist_0202aseILL.safetensors
+  artist_kink_tortoiseshellill:
+    url: https://civitai.com/models/2189260
+    path: models/loras/artist_kink_tortoiseshellILL.safetensors
+  artist_uenomigiill:
+    url: https://civitai.com/models/2189105
+    path: models/loras/artist_uenomigiILL.safetensors
+  artist_krokobyakaill:
+    url: https://civitai.com/models/2189066
+    path: models/loras/artist_krokobyakaILL.safetensors
+  artist_derpixonill:
+    url: https://civitai.com/models/2189009
+    path: models/loras/artist_derpixonILL.safetensors
+  artist_gilelvgrenpinupill:
+    url: https://civitai.com/models/2149356
+    path: models/loras/artist_GilElvgrenPinupILL.safetensors
+  artist_hexenccmill:
+    url: https://civitai.com/models/2147659
+    path: models/loras/artist_hexenccmILL.safetensors
+  artist_otissweatill:
+    url: https://civitai.com/models/2147436
+    path: models/loras/artist_OtisSweatILL.safetensors
+  artist_imomononoill:
+    url: https://civitai.com/models/2146731
+    path: models/loras/artist_imomononoILL.safetensors
+  artist_morryevansill:
+    url: https://civitai.com/models/2146654
+    path: models/loras/artist_MorryEvansILL.safetensors
+  artist_adamwarrenill:
+    url: https://civitai.com/models/2146593
+    path: models/loras/artist_AdamWarrenILL.safetensors
+  artist_juzoh13_ill:
+    url: https://civitai.com/models/2142017
+    path: models/loras/artist_juzoh13_ILL.safetensors
+  artist_optionaltypoill:
+    url: https://civitai.com/models/2114621
+    path: models/loras/artist_optionaltypoILL.safetensors
+  artist_muldeokill:
+    url: https://civitai.com/models/2111844
+    path: models/loras/artist_MuldeokILL.safetensors
+  artist_neonglowill:
+    url: https://civitai.com/models/2111625
+    path: models/loras/artist_NeonGlowILL.safetensors
+  artist_neonlineartill:
+    url: https://civitai.com/models/2111577
+    path: models/loras/artist_NeonLineartILL.safetensors
+  artist_snowcandymagicill:
+    url: https://civitai.com/models/2109786
+    path: models/loras/artist_snowcandymagicILL.safetensors
+  artist_gachiakutaill:
+    url: https://civitai.com/models/2102185
+    path: models/loras/artist_GachiakutaILL.safetensors
+  artist_gachiakutamangaill:
+    url: https://civitai.com/models/2098192
+    path: models/loras/artist_GachiakutaMangaILL.safetensors
+  artist_nightcrowingill:
+    url: https://civitai.com/models/2098036
+    path: models/loras/artist_NightcrowingILL.safetensors
+  artist_heikala_artill:
+    url: https://civitai.com/models/2096377
+    path: models/loras/artist_heikala_artILL.safetensors
+  artist_kaisen_tobiuoill:
+    url: https://civitai.com/models/2085179
+    path: models/loras/artist_Kaisen_TobiuoILL.safetensors
+  artist_askziyeill:
+    url: https://civitai.com/models/2083724
+    path: models/loras/artist_askziyeILL.safetensors
+  artist_matata1203ill:
+    url: https://civitai.com/models/2083639
+    path: models/loras/artist_matata1203ILL.safetensors
+  artist_sangdelan_ill:
+    url: https://civitai.com/models/2083591
+    path: models/loras/artist_Sangdelan_ILL.safetensors
+  artist_quxf_ill:
+    url: https://civitai.com/models/2081048
+    path: models/loras/artist_quxf_ILL.safetensors
+  artist_yo_kitsuneill:
+    url: https://civitai.com/models/2080907
+    path: models/loras/artist_Yo_kitsuneILL.safetensors
+  artist_ralphbakshiill:
+    url: https://civitai.com/models/2072243
+    path: models/loras/artist_RalphBakshiILL.safetensors
+  artist_tonocha_ill:
+    url: https://civitai.com/models/2069656
+    path: models/loras/artist_tonocha__ILL.safetensors
+  artist_retroshoujomangaill:
+    url: https://civitai.com/models/2069232
+    path: models/loras/artist_RetroShoujoMangaILL.safetensors
+  artist_do_shi_ill:
+    url: https://civitai.com/models/2068355
+    path: models/loras/artist_do___shi_ILL.safetensors
+  artist_ta_u_laill:
+    url: https://civitai.com/models/2067697
+    path: models/loras/artist_ta_u_laILL.safetensors
+  artist_nigelgrazill:
+    url: https://civitai.com/models/2063789
+    path: models/loras/artist_NigelGrazILL.safetensors
+  artist_yenkurlill:
+    url: https://civitai.com/models/2063763
+    path: models/loras/artist_YenkurlILL.safetensors
+  artist_mt5_014ill:
+    url: https://civitai.com/models/2061749
+    path: models/loras/artist_mt5_014ILL.safetensors
+  artist_u80x8bltm00rqeoill:
+    url: https://civitai.com/models/2061690
+    path: models/loras/artist_U80x8Bltm00RqeoILL.safetensors
+  artist_mmjtingill:
+    url: https://civitai.com/models/2061386
+    path: models/loras/artist_mmjtingILL.safetensors
+  artist_neoru18436ill:
+    url: https://civitai.com/models/2061368
+    path: models/loras/artist_NeoRu18436ILL.safetensors
+  artist_fumio9361ill:
+    url: https://civitai.com/models/2058873
+    path: models/loras/artist_fumio9361ILL.safetensors
+  artist_kafunill:
+    url: https://civitai.com/models/2054183
+    path: models/loras/artist_kafunILL.safetensors
+  artist_tsubonari_8ill:
+    url: https://civitai.com/models/2052968
+    path: models/loras/artist_tsubonari_8ILL.safetensors
+  artist_onoimokoill:
+    url: https://civitai.com/models/2052852
+    path: models/loras/artist_onoimokoILL.safetensors
+  artist_ax94gnill:
+    url: https://civitai.com/models/2051610
+    path: models/loras/artist__Ax94gnILL.safetensors
+  artist_starshadowmagicill:
+    url: https://civitai.com/models/2051542
+    path: models/loras/artist_starshadowmagicILL.safetensors
+  artist_elliemaplefoxill:
+    url: https://civitai.com/models/2042275
+    path: models/loras/artist_EllieMaplefoxILL.safetensors
+  artist_godiva_ghoulill:
+    url: https://civitai.com/models/2041240
+    path: models/loras/artist_godiva_ghoulILL.safetensors
+  artist_the_boondocksill:
+    url: https://civitai.com/models/2040083
+    path: models/loras/artist_The_BoondocksILL.safetensors
+  artist_mohrbacherill:
+    url: https://civitai.com/models/2037021
+    path: models/loras/artist_MohrbacherILL.safetensors
+  artist_oyari_ashitoillv2:
+    url: https://civitai.com/models/2032547
+    path: models/loras/artist_oyari_ashitoILLV2.safetensors
+  artist_qing0ying0ill:
+    url: https://civitai.com/models/2030453
+    path: models/loras/artist_qing0ying0ILL.safetensors
+  artist_matata1203ill_2:
+    url: https://civitai.com/models/2030369
+    path: models/loras/artist_matata1203ILL.safetensors
+  artist_sorrownyill:
+    url: https://civitai.com/models/2029033
+    path: models/loras/artist_sorrownyILL.safetensors
+  artist_kxbo99ill:
+    url: https://civitai.com/models/2027375
+    path: models/loras/artist_KXBO99ILL.safetensors
+  artist_shiratamahaill:
+    url: https://civitai.com/models/2019903
+    path: models/loras/artist_shiratamahaILL.safetensors
+  artist_n00dlesandwitchill:
+    url: https://civitai.com/models/2019785
+    path: models/loras/artist_N00dlesandwitchILL.safetensors
+  artist_washanappleill:
+    url: https://civitai.com/models/1993846
+    path: models/loras/artist_washanappleILL.safetensors
+  artist_hongbswsill:
+    url: https://civitai.com/models/1992381
+    path: models/loras/artist_HongBsWsILL.safetensors
+  artist_nezt_ossill:
+    url: https://civitai.com/models/1990482
+    path: models/loras/artist_Nezt_OssILL.safetensors
+  artist_mttsczill:
+    url: https://civitai.com/models/1989751
+    path: models/loras/artist_mttsczILL.safetensors
+  artist_lilbluubirdill:
+    url: https://civitai.com/models/1989696
+    path: models/loras/artist_lilbluubirdILL.safetensors
+  artist_yuki12278947ill:
+    url: https://civitai.com/models/1988021
+    path: models/loras/artist_yuki12278947ILL.safetensors
+  artist_mushi_aoiill:
+    url: https://civitai.com/models/1976004
+    path: models/loras/artist_mushi_aoiILL.safetensors
+  artist_sarakipinill:
+    url: https://civitai.com/models/1975963
+    path: models/loras/artist_sarakipinILL.safetensors
+  artist_hanataro_sruvhqkehy1ziedill:
+    url: https://civitai.com/models/1966429
+    path: models/loras/artist_hanataro_sruvhqkehy1ziedILL.safetensors
+  artist_maidcousinill:
+    url: https://civitai.com/models/1960562
+    path: models/loras/artist_maidcousinILL.safetensors
+  artist_douluo_daluill:
+    url: https://civitai.com/models/1958549
+    path: models/loras/artist_douluo_daluILL.safetensors
+  artist_nikulina_helenaill:
+    url: https://civitai.com/models/1957364
+    path: models/loras/artist_nikulina-helenaILL.safetensors
+  artist_dreamrotill:
+    url: https://civitai.com/models/1954961
+    path: models/loras/artist_DreamrotILL.safetensors
+  artist_coconut_nekoparaill:
+    url: https://civitai.com/models/1951630
+    path: models/loras/artist_coconut_nekoparaILL.safetensors
+  artist_harumakiill:
+    url: https://civitai.com/models/1949232
+    path: models/loras/artist_harumakiILL.safetensors
+  artist_doodlelotill:
+    url: https://civitai.com/models/1949089
+    path: models/loras/artist_DoodlelotILL.safetensors
+  artist_kousei_mzill:
+    url: https://civitai.com/models/1947151
+    path: models/loras/artist_kousei_mzILL.safetensors
+  artist_sakiyama8maill:
+    url: https://civitai.com/models/1941839
+    path: models/loras/artist_sakiyama8maILL.safetensors
+  artist_queasy_sill:
+    url: https://civitai.com/models/1937570
+    path: models/loras/artist_queasy_sILL.safetensors
+  artist_david_nakayamaill:
+    url: https://civitai.com/models/1936153
+    path: models/loras/artist_david_nakayamaILL.safetensors
+  artist_rexpoill:
+    url: https://civitai.com/models/1929952
+    path: models/loras/artist_rexpoILL.safetensors
+  artist_crrnill:
+    url: https://civitai.com/models/1929911
+    path: models/loras/artist_crrnILL.safetensors
+  artist_pigeon666ill:
+    url: https://civitai.com/models/1926630
+    path: models/loras/artist_pigeon666ILL.safetensors
+  artist_yoneyama_maiill:
+    url: https://civitai.com/models/1923818
+    path: models/loras/artist_yoneyama_maiILL.safetensors
+  artist_hb_091ill:
+    url: https://civitai.com/models/1917196
+    path: models/loras/artist_HB_091ILL.safetensors
+  artist_daodttill:
+    url: https://civitai.com/models/1914633
+    path: models/loras/artist_DaodttILL.safetensors
+  artist_mossacannibalisill:
+    url: https://civitai.com/models/1912044
+    path: models/loras/artist_MossacannibalisILL.safetensors
+  artist_illumi999ill:
+    url: https://civitai.com/models/1904657
+    path: models/loras/artist_illumi999ILL.safetensors
+  artist_raichiyo33ill:
+    url: https://civitai.com/models/1904512
+    path: models/loras/artist_raichiyo33ILL.safetensors
+  artist_lhata4564ill:
+    url: https://civitai.com/models/1902644
+    path: models/loras/artist_Lhata4564ILL.safetensors
+  artist_gharlieraill:
+    url: https://civitai.com/models/1902500
+    path: models/loras/artist_GharlieraILL.safetensors
+  artist_playzholderill:
+    url: https://civitai.com/models/1901941
+    path: models/loras/artist_PlayzholderILL.safetensors
+  artist_kpopdemonhuntersill:
+    url: https://civitai.com/models/1869132
+    path: models/loras/artist_KPopDemonHuntersILL.safetensors
+  artist_kpopdemonhunterschibistyleill:
+    url: https://civitai.com/models/1869055
+    path: models/loras/artist_KPopDemonHuntersChibiStyleILL.safetensors
+  artist_pnvickyill:
+    url: https://civitai.com/models/1868699
+    path: models/loras/artist_pnvickyILL.safetensors
+  artist_osididill:
+    url: https://civitai.com/models/1868071
+    path: models/loras/artist_OsididILL.safetensors
+  artist_kangyannanill:
+    url: https://civitai.com/models/1848547
+    path: models/loras/artist_kangyannanILL.safetensors
+  artist_philtomatoill:
+    url: https://civitai.com/models/1845769
+    path: models/loras/artist_PhiltomatoILL.safetensors
+  artist_lvl374ill:
+    url: https://civitai.com/models/1845358
+    path: models/loras/artist_lvl374ILL.safetensors
+  artist_yottasunill:
+    url: https://civitai.com/models/1843071
+    path: models/loras/artist_yottasunILL.safetensors
+  artist_tarokunnnnill:
+    url: https://civitai.com/models/1828159
+    path: models/loras/artist_TarokunnnnILL.safetensors
+  artist_petravoiceill:
+    url: https://civitai.com/models/1826595
+    path: models/loras/artist_PetravoiceILL.safetensors
+  artist_m7radiogalaxyill:
+    url: https://civitai.com/models/1826532
+    path: models/loras/artist_M7radiogalaxyILL.safetensors
+  artist_peterpanretrostyleill:
+    url: https://civitai.com/models/1825270
+    path: models/loras/artist_PeterPanRetroStyleILL.safetensors
+  artist_vinneartill:
+    url: https://civitai.com/models/1810262
+    path: models/loras/artist_VinneartILL.safetensors
+  artist_artdecoill:
+    url: https://civitai.com/models/1810203
+    path: models/loras/artist_ArtDecoILL.safetensors
+  artist_guelstyleill:
+    url: https://civitai.com/models/1770349
+    path: models/loras/artist_GuelStyleILL.safetensors
+  artist_retrogothicanimeill:
+    url: https://civitai.com/models/1758935
+    path: models/loras/artist_RetroGothicAnimeILL.safetensors
+  artist_shirow_masamuneill:
+    url: https://civitai.com/models/1755296
+    path: models/loras/artist_shirow_masamuneILL.safetensors
+  artist_chakiaiha0315ill:
+    url: https://civitai.com/models/1754356
+    path: models/loras/artist_chakiaiha0315ILL.safetensors
+  artist_suzuhira_hiroill:
+    url: https://civitai.com/models/1735525
+    path: models/loras/artist_suzuhira_hiroILL.safetensors
+  artist_nasukichanill:
+    url: https://civitai.com/models/1718535
+    path: models/loras/artist_NasukiChanILL.safetensors
+  artist_ogvixonstyleill:
+    url: https://civitai.com/models/306493
+    path: models/loras/artist_OGVixonStyleILL.safetensors
+  artist_biscuitcakeill:
+    url: https://civitai.com/models/1681220
+    path: models/loras/artist_BiscuitCakeILL.safetensors
+  artist_ruinedbeautyill:
+    url: https://civitai.com/models/1660720
+    path: models/loras/artist_RuinedBeautyILL.safetensors
+  artist_kawarajima_kouill:
+    url: https://civitai.com/models/1651489
+    path: models/loras/artist_kawarajima_kouILL.safetensors
+  artist_dark_souls_elden_ringill:
+    url: https://civitai.com/models/1651431
+    path: models/loras/artist_Dark_Souls_Elden_RingILL.safetensors
+  artist_neon_genesis_evangelionill:
+    url: https://civitai.com/models/1648940
+    path: models/loras/artist_neon_genesis_evangelionILL.safetensors
+  artist_vampirellaill:
+    url: https://civitai.com/models/1647813
+    path: models/loras/artist_VampirellaILL.safetensors
+  artist_gregstaplesill:
+    url: https://civitai.com/models/1645773
+    path: models/loras/artist_GregStaplesILL.safetensors
+  artist_aelion_drawsill:
+    url: https://civitai.com/models/1632702
+    path: models/loras/artist_aelion_drawsILL.safetensors
+  artist_chuu0105ill:
+    url: https://civitai.com/models/1632591
+    path: models/loras/artist_chuu0105ILL.safetensors
+  artist_hiroyuki_takahashiill:
+    url: https://civitai.com/models/1631488
+    path: models/loras/artist_hiroyuki_takahashiILL.safetensors
+  artist_soranamaeill:
+    url: https://civitai.com/models/1631408
+    path: models/loras/artist_soranamaeILL.safetensors
+  artist_yuekoill:
+    url: https://civitai.com/models/1626827
+    path: models/loras/artist_yuekoILL.safetensors
+  artist_gdbeeartill:
+    url: https://civitai.com/models/1626688
+    path: models/loras/artist_gdbeeartILL.safetensors
+  artist_messydigitalpaintingill:
+    url: https://civitai.com/models/1607778
+    path: models/loras/artist_messydigitalpaintingILL.safetensors
+  artist_dreamcoreneonill:
+    url: https://civitai.com/models/1586129
+    path: models/loras/artist_DreamcoreNeonILL.safetensors
+  artist_humberto_ramosill:
+    url: https://civitai.com/models/1566720
+    path: models/loras/artist_Humberto_RamosILL.safetensors
+  artist_lostinyourdreamsill:
+    url: https://civitai.com/models/1558671
+    path: models/loras/artist_LostInYourDreamsILL.safetensors
+  artist_magali_villeneuveill:
+    url: https://civitai.com/models/1532409
+    path: models/loras/artist_Magali_VilleneuveILL.safetensors
+  artist_cowboybebopill:
+    url: https://civitai.com/models/1528245
+    path: models/loras/artist_CowboyBebopILL.safetensors
+  artist_hara_id_21ill:
+    url: https://civitai.com/models/1478198
+    path: models/loras/artist_hara_id_21ILL.safetensors
+  artist_projecttigerill:
+    url: https://civitai.com/models/1478082
+    path: models/loras/artist_projecttigerILL.safetensors
+  artist_windows_98ill:
+    url: https://civitai.com/models/1432053
+    path: models/loras/artist_windows_98ILL.safetensors
+  artist_pfpcircleill:
+    url: https://civitai.com/models/1431705
+    path: models/loras/artist_PfpCircleILL.safetensors
+  artist_south_parkill:
+    url: https://civitai.com/models/1430493
+    path: models/loras/artist_south_parkILL.safetensors
+  artist_feelingblueill:
+    url: https://civitai.com/models/1428495
+    path: models/loras/artist_FeelingBlueILL.safetensors
+  artist_cutecoredecoraill:
+    url: https://civitai.com/models/1425630
+    path: models/loras/artist_CutecoreDecoraILL.safetensors
+  artist_fireandiceill:
+    url: https://civitai.com/models/1425358
+    path: models/loras/artist_FireandIceILL.safetensors
+  artist_studio_ghibliill:
+    url: https://civitai.com/models/1416735
+    path: models/loras/artist_studio_ghibliILL.safetensors
+  artist_high_detailill:
+    url: https://civitai.com/models/1414247
+    path: models/loras/artist_high_detailILL.safetensors
+  artist_theworldisredill:
+    url: https://civitai.com/models/1413049
+    path: models/loras/artist_TheWorldIsRedILL.safetensors
+  artist_silenthillstyleill:
+    url: https://civitai.com/models/1409488
+    path: models/loras/artist_SilentHillStyleILL.safetensors
+  artist_wedillustill:
+    url: https://civitai.com/models/1402494
+    path: models/loras/artist_WedillustILL.safetensors
+  artist_beachghost_ill:
+    url: https://civitai.com/models/1396473
+    path: models/loras/artist_beachghost_ILL.safetensors
+  artist_raymondswanlandill:
+    url: https://civitai.com/models/1390342
+    path: models/loras/artist_RaymondSwanlandILL.safetensors
+  artist_kodokuill:
+    url: https://civitai.com/models/1384472
+    path: models/loras/artist_kodokuILL.safetensors
+  artist_thelastunicornill:
+    url: https://civitai.com/models/1348268
+    path: models/loras/artist_TheLastUnicornILL.safetensors
+  artist_gloomill:
+    url: https://civitai.com/models/1310041
+    path: models/loras/artist_GloomILL.safetensors
+  artist_creepycuteill:
+    url: https://civitai.com/models/1309761
+    path: models/loras/artist_CreepyCuteILL.safetensors
+  artist_pastelill:
+    url: https://civitai.com/models/1300388
+    path: models/loras/artist_PastelILL.safetensors
+  artist_gustavklimtill:
+    url: https://civitai.com/models/1293445
+    path: models/loras/artist_GustavKlimtILL.safetensors
+  artist_whitenegativespaceill:
+    url: https://civitai.com/models/1292294
+    path: models/loras/artist_WhiteNegativeSpaceILL.safetensors
+  artist_trippyill:
+    url: https://civitai.com/models/1270176
+    path: models/loras/artist_TrippyILL.safetensors
+  artist_richardkanefergusonill:
+    url: https://civitai.com/models/1267736
+    path: models/loras/artist_RichardKaneFergusonILL.safetensors
+  artist_phantomill:
+    url: https://civitai.com/models/1266842
+    path: models/loras/artist_PhantomILL.safetensors
+  artist_dino_dinoartforameill:
+    url: https://civitai.com/models/1252804
+    path: models/loras/artist_dino_dinoartforameILL.safetensors
+  artist_ghostlywhiteill:
+    url: https://civitai.com/models/1256161
+    path: models/loras/artist_GhostlyWhiteILL.safetensors
+  artist_blueoutlinedigill:
+    url: https://civitai.com/models/1230296
+    path: models/loras/artist_BlueOutlineDigILL.safetensors
+  artist_expressivedetailedartill:
+    url: https://civitai.com/models/1229102
+    path: models/loras/artist_ExpressiveDetailedArtILL.safetensors
+  artist_fplill:
+    url: https://civitai.com/models/1229238
+    path: models/loras/artist_FPLILL.safetensors
+  artist_dopill:
+    url: https://civitai.com/models/1226909
+    path: models/loras/artist_DOPILL.safetensors
+  artist_spiralingthoughtsill:
+    url: https://civitai.com/models/1207565
+    path: models/loras/artist_SpiralingThoughtsILL.safetensors
+  artist_thermalswirlsill:
+    url: https://civitai.com/models/1207443
+    path: models/loras/artist_ThermalSwirlsILL.safetensors
+  artist_nightjarillustrationill:
+    url: https://civitai.com/models/1182038
+    path: models/loras/artist_NightjarIllustrationILL.safetensors
+  artist_zigouill:
+    url: https://civitai.com/models/1153804
+    path: models/loras/artist_zigouILL.safetensors
+  artist_waynereynoldsill:
+    url: https://civitai.com/models/1145793
+    path: models/loras/artist_waynereynoldsILL.safetensors
+  artist_chuhaibaneill:
+    url: https://civitai.com/models/1141459
+    path: models/loras/artist_chuhaibaneILL.safetensors
+  artist_haruwosiill:
+    url: https://civitai.com/models/1141369
+    path: models/loras/artist_HaruwosiILL.safetensors
+  artist_hharuill:
+    url: https://civitai.com/models/1141257
+    path: models/loras/artist_HharuILL.safetensors
+  artist_mucknagabeill:
+    url: https://civitai.com/models/1141121
+    path: models/loras/artist_mucknagabeILL.safetensors
+  artist_dandecarloill:
+    url: https://civitai.com/models/1140962
+    path: models/loras/artist_DanDeCarloILL.safetensors
+  artist_detailedpixelartill:
+    url: https://civitai.com/models/1130279
+    path: models/loras/artist_DetailedPixelArtILL.safetensors
+  artist_oilpaintingill:
+    url: https://civitai.com/models/1112934
+    path: models/loras/artist_OilPaintingILL.safetensors
+  artist_wiresandtreesill:
+    url: https://civitai.com/models/1102308
+    path: models/loras/artist_WiresandtreesILL.safetensors
+  artist_sebmckinnonill:
+    url: https://civitai.com/models/1036791
+    path: models/loras/artist_SebMcKinnonILL.safetensors
+  artist_dandadanill:
+    url: https://civitai.com/models/1031526
+    path: models/loras/artist_dandadanILL.safetensors
+  artist_auroraborealisill2:
+    url: https://civitai.com/models/1030028
+    path: models/loras/artist_auroraborealisILL2.safetensors
+  artist_backlitill:
+    url: https://civitai.com/models/1026983
+    path: models/loras/artist_backlitILL.safetensors
+  artist_tsutomuniheiv2ill:
+    url: https://civitai.com/models/1023889
+    path: models/loras/artist_TsutomuNiheiV2ILL.safetensors
+  artist_junji_ito_artbookill:
+    url: https://civitai.com/models/1023811
+    path: models/loras/artist_Junji_Ito_ArtbookILL.safetensors
+  artist_prismlightill:
+    url: https://civitai.com/models/1023711
+    path: models/loras/artist_prismlightILL.safetensors
+  artist_dappledsunlightill:
+    url: https://civitai.com/models/1020696
+    path: models/loras/artist_DappledSunlightILL.safetensors
+  artist_projectionlightingill:
+    url: https://civitai.com/models/1020650
+    path: models/loras/artist_ProjectionLightingILL.safetensors
+  artist_warmlightingill:
+    url: https://civitai.com/models/1020632
+    path: models/loras/artist_WarmLightingILL.safetensors
+  artist_venetianlightingill:
+    url: https://civitai.com/models/1020556
+    path: models/loras/artist_VenetianLightingILL.safetensors
+  artist_gobolightingill:
+    url: https://civitai.com/models/1020411
+    path: models/loras/artist_GOBOLightingILL.safetensors
+  artist_fennerill:
+    url: https://civitai.com/models/1011811
+    path: models/loras/artist_fennerILL.safetensors
+  artist_suzukasuraimuill:
+    url: https://civitai.com/models/1008090
+    path: models/loras/artist_suzukasuraimuILL.safetensors
+  artist_suzushiroill:
+    url: https://civitai.com/models/1006603
+    path: models/loras/artist_suzushiroILL.safetensors
+  artist_g0thicill3:
+    url: https://civitai.com/models/1003333
+    path: models/loras/artist_g0thicILL3.safetensors
+  artist_sattanill:
+    url: https://civitai.com/models/1003190
+    path: models/loras/artist_sattanILL.safetensors

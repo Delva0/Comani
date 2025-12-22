@@ -1,0 +1,64 @@
+models:
+  slider_sts_illustxl_foreshortening_slider_v1_0:
+    url: https://civitai.com/models/1918778
+    path: models/loras/slider_StS_IllustXL_Foreshortening_Slider_v1.0.safetensors
+  slider_sts_illustxl_ahegao_slider_v0_9:
+    url: https://civitai.com/models/1916927
+    path: models/loras/slider_StS_IllustXL_Ahegao_Slider_v0.9.safetensors
+  slider_sts_illustxl_penis_size_slider_v1_0_ta:
+    url: https://civitai.com/models/1887316
+    path: models/loras/slider_StS_IllustXL_Penis_Size_Slider_v1.0_TA.safetensors
+  slider_sts_illustxl_cat_stretch_v0_9:
+    url: https://civitai.com/models/1229896
+    path: models/loras/slider_StS_IllustXL_Cat_Stretch_v0.9.safetensors
+  slider_sts_age_slider_illustrious_v1:
+    url: https://civitai.com/models/1025710
+    path: models/loras/slider_StS_Age_Slider_Illustrious_v1.safetensors
+  slider_sts_illustrious_detail_slider_v1_0:
+    url: https://civitai.com/models/1001945
+    path: models/loras/slider_StS-Illustrious-Detail-Slider-v1.0.safetensors
+  slider_sts_ponyxl_skin_tone_slider_v1_2_beta:
+    url: https://civitai.com/models/421744
+    path: models/loras/slider_StS-PonyXL-Skin_Tone_Slider-v1.2-BETA.safetensors
+  slider_sts_breast_enlarger_slider_ponyxl_v0_8:
+    url: https://civitai.com/models/549006
+    path: models/loras/slider_StS-Breast-Enlarger-Slider-PonyXL-v0.8.safetensors
+  slider_sts_dof_bokeh_slider_v0_9:
+    url: https://civitai.com/models/546351
+    path: models/loras/slider_StS_DoF_Bokeh_Slider_v0.9.safetensors
+  slider_sts_better_cheerleaders_v0_8:
+    url: https://civitai.com/models/537847
+    path: models/loras/slider_StS-Better-Cheerleaders-v0.8.safetensors
+  slider_sts_ponyxl_better_suspension_bdsm_v0_8:
+    url: https://civitai.com/models/534402
+    path: models/loras/slider_StS-PonyXL-Better-Suspension-BDSM-v0.8.safetensors
+  slider_sts_age_slider_v1_initial_release:
+    url: https://civitai.com/models/402667
+    path: models/loras/slider_StS_age_slider_v1_initial_release.safetensors
+  slider_sts_ponyxl_detail_slider_v1_4_iteration_3:
+    url: https://civitai.com/models/402462
+    path: models/loras/slider_StS_PonyXL_Detail_Slider_v1.4_iteration_3.safetensors
+  slider_sts_pendulum_hypnosis_coin_sdxl:
+    url: https://civitai.com/models/320188
+    path: models/loras/slider_StS-Pendulum-Hypnosis-Coin-SDXL.safetensors
+  slider_shedtheskin_hypno_pendulum_coin:
+    url: https://civitai.com/models/315224
+    path: models/loras/slider_ShedTheSkin-Hypno-Pendulum-Coin.safetensors
+  slider_sts_sdxl_foreshortening_v2_lycoris:
+    url: https://civitai.com/models/325005
+    path: models/loras/slider_StS-SDXL-Foreshortening-v2-LyCORIS.safetensors
+  slider_sts_emma_cravingquest:
+    url: https://civitai.com/models/210438
+    path: models/loras/slider_StS-Emma-CravingQuest.safetensors
+  slider_sts_flchan:
+    url: https://civitai.com/models/209375
+    path: models/loras/slider_StS-FLChan.safetensors
+  slider_sts_franraas:
+    url: https://civitai.com/models/58042
+    path: models/loras/slider_StS-FranRAAS.safetensors
+  slider_sts_lyriagranblue_simple:
+    url: https://civitai.com/models/57350
+    path: models/loras/slider_StS-LyriaGranBlue-Simple.safetensors
+  slider_shedtheskin_penispeek_bulge_v1:
+    url: https://civitai.com/models/204835
+    path: models/loras/slider_ShedTheSkin-PenisPeek-Bulge-v1.safetensors

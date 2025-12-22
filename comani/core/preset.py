@@ -23,7 +23,7 @@ class Preset:
     base_workflow: str
     params: dict[str, Any] = field(default_factory=dict)
     mapping: dict[str, ParamMapping] = field(default_factory=dict)
-    dependencies: dict[str, str] = field(default_factory=dict)
+    dependencies: dict[str, str | list | dict] = field(default_factory=dict)
 
     @classmethod
     def from_yaml(cls, path: Path) -> "Preset":

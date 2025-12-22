@@ -30,7 +30,6 @@ Repository = "https://github.com/delva/comani"
 
 [project.scripts]
 comani = "comani.cli.commands:main"
-comani-download-model = "comani.cli.download_model:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -54,5 +53,6 @@ include = [
 
 [tool.uv]
 dev-dependencies = [
+    "pytest>=9.0.2",
     "ruff>=0.8.0",
 ]

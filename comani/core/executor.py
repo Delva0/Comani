@@ -9,6 +9,7 @@ from typing import Any
 
 from .preset import Preset, PresetManager
 from .client import ComfyUIClient, ComfyUIResult
+from .dependency import DependencyResolver, DependencyError
 
 
 def set_nested_value(obj: dict, path: str, value: Any) -> None:
@@ -189,11 +190,13 @@ class Executor:
         client: ComfyUIClient,
         workflow_loader: WorkflowLoader,
         preset_manager: PresetManager,
+        dependency_resolver: DependencyResolver | None = None,
     ):
         self.client = client
         self.workflow_loader = workflow_loader
         self.workflow_loader.client = client
         self.preset_manager = preset_manager
+        self.dependency_resolver = dependency_resolver
 
     def apply_preset(self, workflow: dict[str, Any], preset: Preset) -> dict[str, Any]:
         """
@@ -234,6 +237,20 @@ class Executor:
 
         return workflow
 
+    def _ensure_dependencies(self, preset: Preset) -> None:
+        """Ensure all preset dependencies are available, download if needed."""
+        if not preset.dependencies:
+            return
+
+        if not self.dependency_resolver:
+            print("Warning: No dependency resolver configured, skipping dependency check")
+            return
+
+        try:
+            self.dependency_resolver.ensure_dependencies(preset.dependencies)
+        except DependencyError as e:
+            raise RuntimeError(f"Dependency error for preset '{preset.name}': {e}")
+
     def execute_preset(
         self,
         preset_name: str,
@@ -247,6 +264,9 @@ class Executor:
 
         if param_overrides:
             preset.params.update(param_overrides)
+
+        # Ensure dependencies are available
+        self._ensure_dependencies(preset)
 
         workflow = self.workflow_loader.load(preset.base_workflow)
 

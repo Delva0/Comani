@@ -1,0 +1,24 @@
+models:
+  anikawaxl_v2:
+    url: https://civitai.com/models/1282887?modelVersionId=2148084
+    path: models/checkpoints/anikawaxl_v2.safetensors
+  boleromix_illustrious:
+    url: https://civitai.com/models/869634?modelVersionId=1412789
+    path: models/checkpoints/boleromix_illustrious.safetensors
+  dupli_cat_flat_illustrious_v10_sdxl:
+    url: https://huggingface.co/John6666/dupli-cat-flat-illustrious-v10-sdxl
+    path: models/checkpoints/dupli-cat-flat-illustrious-v10-sdxl.safetensors
+  dupli_cat_flat_obsession_obs_v10_sdxl:
+    url: https://huggingface.co/John6666/dupli-cat-flat-obsession-obs-v10-sdxl
+    path: models/checkpoints/dupli-cat-flat-obsession-obs-v10-sdxl.safetensors
+  hassaku_xl_illustrious:
+    url: https://civitai.com/models/140272?modelVersionId=1240288
+    path: models/checkpoints/hassaku_xl_illustrious.safetensors
+  plant_milk:
+    url: https://civitai.com/api/download/models/1714314?type=Model&format=SafeTensor&size=pruned&fp=fp16
+    path: models/checkpoints/plant_milk.safetensors
+groups:
+  all_loras:
+    description: All SDXL LoRAs (artists, sliders, misc)
+    includes:
+    - sdxl.lora_*

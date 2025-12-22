@@ -1,0 +1,7 @@
+models:
+  vitpose_l_wholebody:
+    url: https://huggingface.co/JunkyByte/easy_ViTPose/blob/main/onnx/wholebody/vitpose-l-wholebody.onnx
+    path: models/onnx/vitpose-l-wholebody.onnx
+  yolov10m:
+    url: https://huggingface.co/Wan-AI/Wan2.2-Animate-14B/blob/main/process_checkpoint/det/yolov10m.onnx
+    path: models/onnx/yolov10m.onnx

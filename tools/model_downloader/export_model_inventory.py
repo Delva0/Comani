@@ -11,24 +11,22 @@ from __future__ import annotations
 
 import argparse
 import csv
-import importlib.util
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Iterator
 from urllib.parse import parse_qs, urlparse, urlunparse
 
 import requests
-import yaml
 
-
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[2]
 MODELS_DIR = REPO_ROOT / "comani" / "models"
 REQUEST_TIMEOUT = 10
 
-# Ensure repository root is importable for dynamic module loading.
+# Ensure repository root is importable
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
+
+from comani.core.model_pack import ModelPackRegistry
 
 
 @dataclass
@@ -73,23 +71,25 @@ def map_source(url: str) -> str:
     return hostname or "Unknown"
 
 
-def map_item_type(spec_key: str) -> str:
-    key = spec_key.lower()
-    if "lora" in key:
+def map_item_type(path: str) -> str:
+    path_lower = path.lower()
+    if "lora" in path_lower:
         return "LoRA"
-    if "vae" == key:
+    if "/vae/" in path_lower:
         return "VAE"
-    if "text_encoder" in key:
+    if "text_encoder" in path_lower:
         return "Text encoder"
-    if "detection" in key:
+    if "onnx" in path_lower or "/det/" in path_lower:
         return "Detection"
-    if "diffusion" in key or "checkpoint" in key or "diffuser" in key:
+    if "diffusion" in path_lower:
         return "Base model"
-    if "upscale" in key:
+    if "checkpoint" in path_lower:
+        return "Checkpoint"
+    if "upscale" in path_lower:
         return "Upscaler"
-    if "patch" in key:
+    if "patch" in path_lower:
         return "Model patch"
-    return spec_key
+    return "Model"
 
 
 def extract_civitai_ids(url: str) -> tuple[str | None, str | None]:
@@ -107,262 +107,6 @@ def extract_civitai_ids(url: str) -> tuple[str | None, str | None]:
             version_id = version_id or suffix
 
     return version_id, model_id
-
-
-def load_module(path: Path):
-    spec = importlib.util.spec_from_file_location(path.stem, path)
-    if spec is None or spec.loader is None:
-        raise ImportError(f"Unable to load module from {path}")
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[path.stem] = module
-    spec.loader.exec_module(module)
-    return module
-
-
-def resolve_filename(url: str, fallback: str | None = None) -> str:
-    if "civitai.com" in url:
-        name = resolve_civitai_filename(url)
-        if name:
-            return name
-
-    parsed = urlparse(url)
-    tail = Path(parsed.path).name
-    if tail:
-        return tail
-
-    return fallback or ""
-
-
-def derive_save_path(subdir: str, url: str, fallback: str | None = None) -> str:
-    filename = resolve_filename(url, fallback)
-    if filename:
-        return f"models/{subdir}/{filename}"
-    return f"models/{subdir}/"
-
-
-def collect_from_model_py(path: Path, architecture: str) -> Iterator[InventoryEntry]:
-    module = load_module(path)
-
-    if hasattr(module, "MODEL_NAME") and hasattr(module, "SPECS"):
-        name = getattr(module, "MODEL_NAME")
-        specs: dict[str, list[str]] = getattr(module, "SPECS")
-        for key, urls in specs.items():
-            item_type = map_item_type(key)
-            for url in urls:
-                yield InventoryEntry(
-                    architecture=architecture,
-                    subdir=key,
-                    item_type=item_type,
-                    name=name,
-                    url=url,
-                    source=map_source(url),
-                    size_bytes=resolve_size(url),
-                    save_path=derive_save_path(key, url, name),
-                )
-        return
-
-    if path.name == "dupli_cat_flat.py":
-        repos: dict[str, tuple[str, str]] = getattr(module, "REPOS")
-        for name, repo_url in repos.values():
-            yield InventoryEntry(
-                architecture=architecture,
-                subdir="diffusers",
-                item_type="Diffusers pipeline",
-                name=name,
-                url=repo_url,
-                source=map_source(repo_url),
-                size_bytes=resolve_size(repo_url),
-                save_path=derive_save_path("diffusers", repo_url, name),
-            )
-        return
-
-    if path.name == "wan22_i2v.py":
-        name_regular = "WAN 2.2"
-        name_quant = "WAN 2.2 GGUF"
-
-        for url in getattr(module, "DIFFUSION_MODELS_FP8"):
-            yield InventoryEntry(
-                architecture=architecture,
-                subdir="diffusion_models",
-                item_type="Base model",
-                name=name_regular,
-                url=url,
-                source=map_source(url),
-                size_bytes=resolve_size(url),
-                save_path=derive_save_path("diffusion_models", url, name_regular),
-            )
-        for url in getattr(module, "DIFFUSION_MODELS_GGUF"):
-            yield InventoryEntry(
-                architecture=architecture,
-                subdir="diffusion_models",
-                item_type="Quantized model",
-                name=name_quant,
-                url=url,
-                source=map_source(url),
-                size_bytes=resolve_size(url),
-                save_path=derive_save_path("diffusion_models", url, name_quant),
-            )
-        for url in getattr(module, "TEXT_ENCODERS"):
-            yield InventoryEntry(
-                architecture=architecture,
-                subdir="text_encoders",
-                item_type="Text encoder",
-                name=name_regular,
-                url=url,
-                source=map_source(url),
-                size_bytes=resolve_size(url),
-                save_path=derive_save_path("text_encoders", url, name_regular),
-            )
-        for url in getattr(module, "VAE"):
-            yield InventoryEntry(
-                architecture=architecture,
-                subdir="vae",
-                item_type="VAE",
-                name=name_regular,
-                url=url,
-                source=map_source(url),
-                size_bytes=resolve_size(url),
-                save_path=derive_save_path("vae", url, name_regular),
-            )
-        for url in getattr(module, "LORAS"):
-            yield InventoryEntry(
-                architecture=architecture,
-                subdir="loras",
-                item_type="LoRA",
-                name=name_regular,
-                url=url,
-                source=map_source(url),
-                size_bytes=resolve_size(url),
-                save_path=derive_save_path("loras", url, name_regular),
-            )
-        return
-
-    if path.name == "wan22_animate.py":
-        name = getattr(module, "MODEL_NAME")
-        specs: dict[str, list[str]] = getattr(module, "SPECS")
-        for key, urls in specs.items():
-            item_type = map_item_type(key)
-            for url in urls:
-                yield InventoryEntry(architecture, key, item_type, name, url, map_source(url), resolve_size(url), derive_save_path(key, url, name))
-        return
-
-    if path.name == "z_image_turbo.py":
-        bf16_name = "Z-Image-Turbo bf16"
-        gguf_name = "Z-Image-Turbo GGUF"
-
-        for url in getattr(module, "DIFFUSION_MODELS_BF16"):
-            yield InventoryEntry(
-                architecture=architecture,
-                subdir="diffusion_models",
-                item_type="Base model",
-                name=bf16_name,
-                url=url,
-                source=map_source(url),
-                size_bytes=resolve_size(url),
-                save_path=derive_save_path("diffusion_models", url, bf16_name),
-            )
-        for url in getattr(module, "TEXT_ENCODERS_BF16"):
-            yield InventoryEntry(
-                architecture=architecture,
-                subdir="text_encoders",
-                item_type="Text encoder",
-                name=bf16_name,
-                url=url,
-                source=map_source(url),
-                size_bytes=resolve_size(url),
-                save_path=derive_save_path("text_encoders", url, bf16_name),
-            )
-        for url in getattr(module, "VAE"):
-            yield InventoryEntry(
-                architecture=architecture,
-                subdir="vae",
-                item_type="VAE",
-                name=bf16_name,
-                url=url,
-                source=map_source(url),
-                size_bytes=resolve_size(url),
-                save_path=derive_save_path("vae", url, bf16_name),
-            )
-        for url in getattr(module, "LORAS"):
-            yield InventoryEntry(
-                architecture=architecture,
-                subdir="loras",
-                item_type="LoRA",
-                name=bf16_name,
-                url=url,
-                source=map_source(url),
-                size_bytes=resolve_size(url),
-                save_path=derive_save_path("loras", url, bf16_name),
-            )
-        for url in getattr(module, "MODEL_PATCHES"):
-            yield InventoryEntry(
-                architecture=architecture,
-                subdir="model_patches",
-                item_type="Model patch",
-                name=bf16_name,
-                url=url,
-                source=map_source(url),
-                size_bytes=resolve_size(url),
-                save_path=derive_save_path("model_patches", url, bf16_name),
-            )
-
-        for url in getattr(module, "DIFFUSION_MODELS_GGUF"):
-            yield InventoryEntry(
-                architecture=architecture,
-                subdir="diffusion_models",
-                item_type="Quantized model",
-                name=gguf_name,
-                url=url,
-                source=map_source(url),
-                size_bytes=resolve_size(url),
-                save_path=derive_save_path("diffusion_models", url, gguf_name),
-            )
-        for url in getattr(module, "TEXT_ENCODERS_GGUF"):
-            yield InventoryEntry(
-                architecture=architecture,
-                subdir="text_encoders",
-                item_type="Quantized text encoder",
-                name=gguf_name,
-                url=url,
-                source=map_source(url),
-                size_bytes=resolve_size(url),
-                save_path=derive_save_path("text_encoders", url, gguf_name),
-            )
-        return
-
-
-def collect_from_yaml(path: Path, architecture: str) -> Iterator[InventoryEntry]:
-    data = yaml.safe_load(path.read_text()) or {}
-    loras: Iterable[str | dict] = data.get("loras", [])
-    for entry in loras:
-        if isinstance(entry, str):
-            url = entry
-            name = infer_name_from_url(url)
-        else:
-            url = entry.get("url") or ""
-            name = entry.get("filename") or infer_name_from_url(url)
-
-        if not url:
-            continue
-
-        yield InventoryEntry(
-            architecture=architecture,
-            subdir="loras",
-            item_type="LoRA",
-            name=name,
-            url=url,
-            source=map_source(url),
-            size_bytes=None,
-            save_path=derive_save_path("loras", url, name),
-        )
-
-
-def infer_name_from_url(url: str) -> str:
-    parsed = urlparse(url)
-    tail = Path(parsed.path).name
-    if tail:
-        return tail
-    return url
 
 
 def normalize_huggingface_url(url: str) -> str:
@@ -433,41 +177,6 @@ def resolve_civitai_size(url: str) -> int | None:
     return None
 
 
-def civitai_version_filename(version_id: str) -> str | None:
-    data = civitai_version_cache.get(version_id)
-    if data is None:
-        return None
-    if not data:
-        return None
-    files = data.get("files") or []
-    if not files:
-        return None
-    return files[0].get("name")
-
-
-def civitai_model_filename(model_id: str) -> str | None:
-    data = civitai_model_cache.get(model_id)
-    if not data:
-        return None
-    versions = data.get("modelVersions") or []
-    for version in versions:
-        files = version.get("files") or []
-        if files:
-            name = files[0].get("name")
-            if name:
-                return name
-    return None
-
-
-def resolve_civitai_filename(url: str) -> str | None:
-    version_id, model_id = extract_civitai_ids(url)
-    if version_id:
-        return civitai_version_filename(version_id)
-    if model_id:
-        return civitai_model_filename(model_id)
-    return None
-
-
 def civitai_version_size(version_id: str) -> int | None:
     data = fetch_civitai_version(version_id)
     if not data:
@@ -504,16 +213,37 @@ def resolve_size(url: str) -> int | None:
 
 
 def collect_inventory() -> list[InventoryEntry]:
+    """Collect inventory from new YAML model pack format."""
     entries: list[InventoryEntry] = []
-    for path in MODELS_DIR.rglob("*.py"):
-        if path.name in {"__init__.py", "download.py"}:
-            continue
-        arch = path.parent.name
-        entries.extend(list(collect_from_model_py(path, arch)))
+    registry = ModelPackRegistry(MODELS_DIR)
 
-    for path in MODELS_DIR.rglob("*.yml"):
-        arch = path.parent.parent.name if path.parent.name == "loras" else path.parent.name
-        entries.extend(list(collect_from_yaml(path, arch)))
+    for model in registry.list_models():
+        # Extract architecture from source file
+        source_file = model.source_file
+        if "/" in source_file:
+            architecture = source_file.split("/")[0]
+        else:
+            architecture = source_file
+
+        # Extract subdir from path
+        path_parts = model.path.split("/")
+        if len(path_parts) >= 2 and path_parts[0] == "models":
+            subdir = path_parts[1]
+        else:
+            subdir = "unknown"
+
+        entries.append(
+            InventoryEntry(
+                architecture=architecture,
+                subdir=subdir,
+                item_type=map_item_type(model.path),
+                name=model.id,
+                url=model.url,
+                source=map_source(model.url),
+                size_bytes=resolve_size(model.url),
+                save_path=model.path,
+            )
+        )
 
     return entries
 

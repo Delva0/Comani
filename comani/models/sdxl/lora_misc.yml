@@ -1,0 +1,28 @@
+models:
+  noobaivpred10insertion_vpred10v2:
+    url: https://civitai.com/models/1443799?modelVersionId=1663220
+    path: models/loras/NoobaiVpred10Insertion_vpred10V2.safetensors
+  detailedeyes_v3:
+    url: https://civitai.com/models/120723?modelVersionId=145907
+    path: models/loras/DetailedEyes_V3.safetensors
+  m_748cmsdxl:
+    url: https://civitai.com/models/943607?modelVersionId=1056404
+    path: models/loras/748cmSDXL.safetensors
+  noob_vp1_detailer_by_volnovik_v1:
+    url: https://civitai.com/models/987736?modelVersionId=1209350
+    path: models/loras/NOOB_vp1_detailer_by_volnovik_v1.safetensors
+  moriimee_gothic_niji_style_illustrious_r1:
+    url: https://civitai.com/models/915918?modelVersionId=1244133
+    path: models/loras/MoriiMee_Gothic_Niji_Style_Illustrious_r1.safetensors
+  ponyv6_noobv1_2_adamw_000017:
+    url: https://civitai.com/models/856285?modelVersionId=1247042
+    path: models/loras/ponyv6_noobV1_2_adamW-000017.safetensors
+  noobai_vpred_1_masterpieces_v1:
+    url: https://civitai.com/models/929497?modelVersionId=1268447
+    path: models/loras/noobai_vpred_1_masterpieces_v1.safetensors
+  marin_dress_up_darling_il_v2:
+    url: https://civitai.com/models/1145224?modelVersionId=2262434
+    path: models/loras/Marin_Dress_up_Darling_IL_V2.safetensors
+  squirt_squirting_il:
+    url: https://civitai.com/models/1447530/squirt-squirting-il
+    path: models/loras/squirt-squirting-il.safetensors

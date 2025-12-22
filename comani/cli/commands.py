@@ -5,9 +5,13 @@ CLI commands for Comani.
 import argparse
 import json
 import sys
+from pathlib import Path
 from typing import Any
 
 from ..core.engine import ComaniEngine
+from ..core.model_pack import ModelPackRegistry, ModelDef, ResolvedGroup
+
+MODELS_ROOT = Path(__file__).parent.parent / "models"
 
 
 def print_json(data: Any) -> None:
@@ -92,6 +96,273 @@ def cmd_clear(args: argparse.Namespace) -> int:
     return 0 if success else 1
 
 
+# =========================================================================
+# Model Commands (new unified API with Python-like naming)
+# =========================================================================
+
+def _get_registry() -> ModelPackRegistry:
+    """Get the model pack registry."""
+    return ModelPackRegistry(MODELS_ROOT)
+
+
+def _print_model_tree(registry: ModelPackRegistry) -> None:
+    """Print all available models and groups in tree format."""
+    print("\n📦 Available Model Packs:")
+    print("=" * 60)
+
+    for module_name in sorted(registry.list_modules()):
+        # Determine display format based on module depth
+        parts = module_name.split(".")
+        if len(parts) == 1:
+            print(f"\n📁 {module_name}")
+        else:
+            indent = "  " * (len(parts) - 1)
+            print(f"\n{indent}📁 {module_name}")
+
+        # List models
+        models = registry.list_models(module_name)
+        if models:
+            indent = "  " * len(parts)
+            print(f"{indent}Models ({len(models)}):")
+            for model in models[:5]:  # Show first 5
+                print(f"{indent}  - {model.id}")
+            if len(models) > 5:
+                print(f"{indent}  ... and {len(models) - 5} more")
+
+        # List groups
+        groups = registry.list_groups(module_name)
+        if groups:
+            indent = "  " * len(parts)
+            print(f"{indent}Groups ({len(groups)}):")
+            for group in groups:
+                print(f"{indent}  📦 {group.id}: {group.description}")
+
+
+def _print_resolved_group(group: ResolvedGroup) -> None:
+    """Print details of a resolved group."""
+    print(f"\n📦 {group.id}")
+    print(f"   {group.description}")
+    print(f"\n   Models ({len(group.models)}):")
+    for model in group.models:
+        print(f"   - {model.source_module}.{model.id}")
+        # print(f"     URL: {model.url[:60]}..." if len(model.url) > 60 else f"     URL: {model.url}")
+        # print(f"     Path: {model.path}")
+
+
+def _print_ref_info(ref: str, ref_type: str, count: int) -> None:
+    """Print information about a single reference."""
+    type_emoji = {
+        "model": "📄",
+        "group": "📦",
+        "module": "📁",
+        "package": "📂",
+        "wildcard pattern": "✨",
+        "unknown": "❓",
+    }
+    emoji = type_emoji.get(ref_type, "❓")
+    print(f"   {emoji} {ref} is {ref_type} ({count} models)")
+
+
+def _interactive_select(registry: ModelPackRegistry) -> str | None:
+    """Interactive menu to select a model or group."""
+    try:
+        import questionary
+        from questionary import Style
+    except ImportError:
+        print("Error: questionary not installed. Use --list or specify target directly.")
+        return None
+
+    style = Style([
+        ("qmark", "fg:cyan bold"),
+        ("question", "fg:green bold"),
+        ("answer", "fg:green bold"),
+        ("pointer", "fg:cyan bold"),
+        ("highlighted", "fg:cyan bold"),
+        ("selected", "fg:green"),
+        ("separator", "fg:gray"),
+    ])
+
+    modules = registry.list_modules()
+    if not modules:
+        print("No model packs found.")
+        return None
+
+    # First select module
+    module_choices = [questionary.Choice(title=m, value=m) for m in modules]
+    selected_module = questionary.select(
+        "Select module:",
+        choices=module_choices,
+        style=style,
+    ).ask()
+
+    if not selected_module:
+        return None
+
+    # Then select model or group
+    choices = []
+
+    # Add "all" option
+    choices.append(questionary.Choice(
+        title=f"[ALL] Download entire {selected_module}",
+        value=selected_module
+    ))
+
+    # Add groups
+    groups = registry.list_groups(selected_module)
+    for group in groups:
+        choices.append(questionary.Choice(
+            title=f"[GROUP] {group.id}: {group.description}",
+            value=f"{selected_module}.{group.id}"
+        ))
+
+    # Add models
+    models = registry.list_models(selected_module)
+    for model in models:
+        choices.append(questionary.Choice(
+            title=f"[MODEL] {model.id}",
+            value=f"{selected_module}.{model.id}"
+        ))
+
+    selection = questionary.select(
+        f"Select from {selected_module}:",
+        choices=choices,
+        style=style,
+    ).ask()
+
+    return selection
+
+
+def cmd_model_list(args: argparse.Namespace) -> int:
+    """List available models and groups."""
+    registry = _get_registry()
+
+    targets = args.targets if args.targets else []
+
+    if targets:
+        # Show details for specific targets (supports multiple)
+        if len(targets) == 1:
+            resolved = registry.resolve_to_group(targets[0])
+            if not resolved.models:
+                print(f"Error: No models found for '{targets[0]}'")
+                return 1
+            _print_resolved_group(resolved)
+        else:
+            # Multiple targets - use resolve_multiple
+            combined, ref_info = registry.resolve_multiple(targets)
+
+            print("\n📋 Target Analysis:")
+            print("-" * 40)
+            for ref, ref_type, count in ref_info:
+                _print_ref_info(ref, ref_type, count)
+
+            print("\n" + "=" * 40)
+            print(f"📊 Total: {len(combined.models)} unique models")
+            print("=" * 40)
+
+            _print_resolved_group(combined)
+    else:
+        _print_model_tree(registry)
+
+    return 0
+
+
+def cmd_model_download(args: argparse.Namespace) -> int:
+    """Download models."""
+    registry = _get_registry()
+    engine = ComaniEngine()
+    comfyui_root = args.comfyui_root
+
+    targets = args.targets if args.targets else []
+
+    # Interactive mode
+    if not targets:
+        if not (sys.stdin.isatty() and sys.stdout.isatty()):
+            print("Error: Interactive mode requires a terminal.")
+            print("Use 'comani model list' to see available models.")
+            return 1
+
+        print("🎨 ComfyUI Model Downloader")
+        print("=" * 40)
+        target = _interactive_select(registry)
+        if not target:
+            return 0
+        targets = [target]
+
+    # Resolve targets to models
+    if len(targets) == 1:
+        resolved = registry.resolve_to_group(targets[0])
+        if not resolved.models:
+            print(f"Error: No models found for '{targets[0]}'")
+            return 1
+
+        print(f"\n📦 Downloading: {resolved.id}")
+        print(f"   {resolved.description}")
+        print(f"   {len(resolved.models)} model(s) to download\n")
+    else:
+        # Multiple targets
+        resolved, ref_info = registry.resolve_multiple(targets)
+
+        if not resolved.models:
+            print("Error: No models found for any of the specified targets")
+            return 1
+
+        print("\n📋 Target Analysis:")
+        print("-" * 40)
+        for ref, ref_type, count in ref_info:
+            _print_ref_info(ref, ref_type, count)
+
+        print("\n" + "=" * 40)
+        print(f"📊 Total: {len(resolved.models)} unique models to download")
+        print("=" * 40 + "\n")
+
+    if args.dry_run:
+        print("[DRY-RUN] Would download:")
+        for model in resolved.models:
+            print(f"  - {model.source_module}.{model.id}: {model.path}")
+        return 0
+
+    # Download using engine
+    downloader = engine.get_downloader(comfyui_root)
+    specs = _models_to_download_specs(resolved.models)
+    downloader.download_spec(resolved.id, specs)
+
+    return 0
+
+
+def _models_to_download_specs(models: list[ModelDef]) -> dict[str, list[dict]]:
+    """Convert ModelDef list to download spec format."""
+    specs: dict[str, list[dict]] = {}
+
+    for model in models:
+        # Extract subdir from path (e.g., "models/vae/xxx.safetensors" -> "vae")
+        path_parts = model.path.split("/")
+        if len(path_parts) >= 2 and path_parts[0] == "models":
+            subdir = path_parts[1]
+        else:
+            subdir = "checkpoints"
+
+        if subdir not in specs:
+            specs[subdir] = []
+
+        specs[subdir].append({
+            "url": model.url,
+            "name": path_parts[-1] if path_parts else model.id,
+        })
+
+    return specs
+
+
+def cmd_model(args: argparse.Namespace) -> int:
+    """Model subcommand dispatcher."""
+    if args.model_action == "list":
+        return cmd_model_list(args)
+    elif args.model_action == "download":
+        return cmd_model_download(args)
+    else:
+        print("Error: Unknown action. Use 'list' or 'download'.")
+        return 1
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         prog="comani",
@@ -128,6 +399,28 @@ def main() -> int:
     # clear
     subparsers.add_parser("clear", help="Clear the execution queue")
 
+    # model (new unified command)
+    model_parser = subparsers.add_parser("model", help="Model management commands")
+    model_subparsers = model_parser.add_subparsers(dest="model_action", help="Model actions")
+
+    # model list - supports multiple targets with Python-like syntax
+    model_list_parser = model_subparsers.add_parser("list", help="List available models and groups")
+    model_list_parser.add_argument(
+        "targets",
+        nargs="*",
+        help="Model/group/module references (e.g., 'wan', 'wan.wan22_animate', 'sdxl.*')"
+    )
+
+    # model download - supports multiple targets with Python-like syntax
+    model_download_parser = model_subparsers.add_parser("download", help="Download models")
+    model_download_parser.add_argument(
+        "targets",
+        nargs="*",
+        help="Model/group/module references (e.g., 'wan', 'wan.wan22_animate', 'sdxl.sdxl.anikawaxl_v2')"
+    )
+    model_download_parser.add_argument("--comfyui-root", help="ComfyUI directory path")
+    model_download_parser.add_argument("--dry-run", action="store_true", help="Show what would be downloaded without downloading")
+
     args = parser.parse_args()
 
     if not args.command:
@@ -142,9 +435,15 @@ def main() -> int:
         "queue": cmd_queue,
         "interrupt": cmd_interrupt,
         "clear": cmd_clear,
+        "model": cmd_model,
     }
 
-    return commands[args.command](args)
+    handler = commands.get(args.command)
+    if handler:
+        return handler(args)
+
+    parser.print_help()
+    return 1
 
 
 if __name__ == "__main__":

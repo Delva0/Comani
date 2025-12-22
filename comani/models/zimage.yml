@@ -1,0 +1,38 @@
+models:
+  z_image_turbo_bf16:
+    url: https://huggingface.co/Comfy-Org/z_image_turbo/blob/main/split_files/diffusion_models/z_image_turbo_bf16.safetensors
+    path: models/diffusion_models/z_image_turbo_bf16.safetensors
+  qwen_3_4b:
+    url: https://huggingface.co/Comfy-Org/z_image_turbo/blob/main/split_files/text_encoders/qwen_3_4b.safetensors
+    path: models/text_encoders/qwen_3_4b.safetensors
+  ae:
+    url: https://huggingface.co/Comfy-Org/z_image_turbo/blob/main/split_files/vae/ae.safetensors
+    path: models/vae/ae.safetensors
+  pixel_art_style_z_image_turbo:
+    url: https://huggingface.co/tarn59/pixel_art_style_lora_z_image_turbo/blob/main/pixel_art_style_z_image_turbo.safetensors
+    path: models/loras/pixel_art_style_z_image_turbo.safetensors
+  z_image_turbo_fun_controlnet_union:
+    url: https://huggingface.co/alibaba-pai/Z-Image-Turbo-Fun-Controlnet-Union/blob/main/Z-Image-Turbo-Fun-Controlnet-Union.safetensors
+    path: models/model_patches/Z-Image-Turbo-Fun-Controlnet-Union.safetensors
+  z_image_turbo_q5_k_m:
+    url: https://huggingface.co/jayn7/Z-Image-Turbo-GGUF/blob/main/z_image_turbo-Q5_K_M.gguf
+    path: models/diffusion_models/z_image_turbo-Q5_K_M.gguf
+  qwen3_4b_ud_q4_k_xl:
+    url: https://huggingface.co/unsloth/Qwen3-4B-GGUF/blob/main/Qwen3-4B-UD-Q4_K_XL.gguf
+    path: models/text_encoders/Qwen3-4B-UD-Q4_K_XL.gguf
+groups:
+  turbo_bf16_full:
+    description: Z-Image Turbo BF16 full set (diffusion + text encoder + VAE + extras)
+    includes:
+    - z_image_turbo_bf16
+    - qwen_3_4b
+    - ae
+    - pixel_art_style_z_image_turbo
+    - z_image_turbo_fun_controlnet_union
+
+  turbo_gguf_full:
+    description: Z-Image Turbo GGUF full set (diffusion + text encoder + VAE)
+    includes:
+    - z_image_turbo_q5_k_m
+    - qwen3_4b_ud_q4_k_xl
+    - ae
