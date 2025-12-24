@@ -4,8 +4,8 @@ name: "Cyberpunk City"
 base_workflow: "flux_dev_example.json"
 
 dependencies:
-  unet: "flux1-schnell.safetensors"
-  vae: "ae.safetensors"
+  - "flux1-schnell.safetensors"
+  - "ae.safetensors"
 
 params:
   positive_prompt: "cyberpunk city, neon lights, rain, night scene, 8k, masterpiece, highly detailed"

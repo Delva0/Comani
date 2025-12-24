@@ -8,9 +8,6 @@ Run with:
 from __future__ import annotations
 
 import csv
-import os
-import shutil
-from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -18,13 +15,15 @@ from typing import Iterable, Iterator
 
 import streamlit as st
 
-from comani.utils.model_downloader import (
+from comani.config import get_config
+
+from comani.core.download_model import (
     DownloadItem,
     detect_type,
     download_url,
     resolve_download,
 )
-from comani.core.downloader import ModelDownloader
+from comani.core.download_model import ModelDownloader
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -305,7 +304,8 @@ def main() -> None:
             copy_path = next_copy_path()
             save_selection(entries, copy_path)
     with col3:
-        comfyui_root = st.text_input("COMFYUI_DIR", value=os.environ.get("COMFYUI_DIR", ""))
+        config = get_config()
+        comfyui_root = st.text_input("COMFYUI_DIR", value=str(config.comfyui_root))
         if st.button("下载所选模型"):
             if not comfyui_root:
                 st.error("请填写 COMFYUI_DIR 后再下载。")

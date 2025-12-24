@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from urllib.parse import urljoin
 
 import requests
+from comani.config import get_config
 
 
 @dataclass
@@ -25,10 +26,21 @@ class ComfyUIResult:
 class ComfyUIClient:
     """Client for communicating with ComfyUI server."""
 
-    def __init__(self, base_url: str, timeout: int = 300):
+    def __init__(
+        self,
+        base_url: str,
+        timeout: int = 300,
+        auth: tuple[str, str] | None = None,
+    ):
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
         self.client_id = str(uuid.uuid4())
+
+        # Support HTTP Basic Auth from config or parameter
+        if auth:
+            self.auth = auth
+        else:
+            self.auth = get_config().auth
 
     def _url(self, path: str) -> str:
         return urljoin(self.base_url + "/", path.lstrip("/"))
@@ -36,21 +48,21 @@ class ComfyUIClient:
     def health_check(self) -> bool:
         """Check if ComfyUI server is reachable."""
         try:
-            resp = requests.get(self._url("/system_stats"), timeout=5)
+            resp = requests.get(self._url("/system_stats"), timeout=5, auth=self.auth)
             return resp.status_code == 200
         except requests.RequestException:
             return False
 
     def get_queue(self) -> dict[str, Any]:
         """Get current queue status."""
-        resp = requests.get(self._url("/queue"), timeout=10)
+        resp = requests.get(self._url("/queue"), timeout=10, auth=self.auth)
         resp.raise_for_status()
         return resp.json()
 
     def get_history(self, prompt_id: str | None = None) -> dict[str, Any]:
         """Get execution history."""
         path = f"/history/{prompt_id}" if prompt_id else "/history"
-        resp = requests.get(self._url(path), timeout=10)
+        resp = requests.get(self._url(path), timeout=10, auth=self.auth)
         resp.raise_for_status()
         return resp.json()
 
@@ -67,6 +79,7 @@ class ComfyUIClient:
             self._url("/prompt"),
             json=payload,
             timeout=30,
+            auth=self.auth,
         )
         resp.raise_for_status()
         data = resp.json()
@@ -138,7 +151,7 @@ class ComfyUIClient:
     def interrupt(self) -> bool:
         """Interrupt current execution."""
         try:
-            resp = requests.post(self._url("/interrupt"), timeout=10)
+            resp = requests.post(self._url("/interrupt"), timeout=10, auth=self.auth)
             return resp.status_code == 200
         except requests.RequestException:
             return False
@@ -150,6 +163,7 @@ class ComfyUIClient:
                 self._url("/queue"),
                 json={"clear": True},
                 timeout=10,
+                auth=self.auth,
             )
             return resp.status_code == 200
         except requests.RequestException:
@@ -158,6 +172,6 @@ class ComfyUIClient:
     def get_object_info(self, node_type: str | None = None) -> dict[str, Any]:
         """Get node type information."""
         path = f"/object_info/{node_type}" if node_type else "/object_info"
-        resp = requests.get(self._url(path), timeout=30)
+        resp = requests.get(self._url(path), timeout=30, auth=self.auth)
         resp.raise_for_status()
         return resp.json()

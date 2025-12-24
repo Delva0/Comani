@@ -26,7 +26,7 @@ REQUEST_TIMEOUT = 10
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from comani.core.model_pack import ModelPackRegistry
+from comani.model.model_pack import ModelPackRegistry  # noqa: E402
 
 
 @dataclass

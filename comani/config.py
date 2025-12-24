@@ -1,70 +1,70 @@
 """
-Configuration management for Comani engine.
+Configuration management for Comani engine using Pydantic Settings.
 """
 
-import os
-import shutil
 from pathlib import Path
-from dataclasses import dataclass, field
+from typing import Any
+
+from pydantic import AliasChoices, Field, SecretStr, field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-def get_default_dir(name: str) -> Path:
-    """Get default directory path under comani package."""
-    return Path(__file__).parent / name
-
-
-@dataclass
-class ComaniConfig:
+class ComaniConfig(BaseSettings):
     """Engine configuration loaded from environment variables."""
 
-    server_ip: str = field(default_factory=lambda: os.getenv("COMANI_SERVER_IP", "127.0.0.1"))
-    server_port: int = field(default_factory=lambda: int(os.getenv("COMANI_SERVER_PORT", "8188")))
+    # Remote Server Configuration (SSH)
+    host: str = Field(default="127.0.0.1")
+    port: int = Field(default=22, validation_alias=AliasChoices("SSH_PORT", "COMANI_SSH_PORT", "port"))
+    user: str = Field(default="root", validation_alias=AliasChoices("SSH_USER", "COMANI_SSH_USER", "user"))
+    password: SecretStr | None = Field(default=None, validation_alias=AliasChoices("SSH_PASS", "COMANI_SSH_PASS", "password"))
 
-    model_config_dir: Path = field(default_factory=lambda: Path(
-        os.getenv("COMANI_MODEL_CONFIG_DIR", str(get_default_dir("models")))
-    ))
-    workflow_dir: Path = field(default_factory=lambda: Path(
-        os.getenv("COMANI_WORKFLOW_DIR", str(get_default_dir("workflows")))
-    ))
-    preset_dir: Path = field(default_factory=lambda: Path(
-        os.getenv("COMANI_PRESET_DIR", str(get_default_dir("presets")))
-    ))
+    # ComfyUI Configuration
+    comfyui_port: int = Field(default=8188)
+    comfyui_auth_user: str | None = Field(default=None)
+    comfyui_auth_pass: SecretStr | None = Field(default=None)
+    comfyui_root: Path = Field(default_factory=Path.cwd, validation_alias=AliasChoices("COMANI_COMFYUI_DIR", "comfyui_root"))
 
-    def __post_init__(self):
-        self.model_config_dir = Path(self.model_config_dir)
-        self.workflow_dir = Path(self.workflow_dir)
-        self.preset_dir = Path(self.preset_dir)
+    # Comani Directory Configs
+    examples_dir: Path = Path(__file__).parent.parent / "examples"
+    model_dir: Path | None = Field(default=examples_dir / "models", validation_alias=AliasChoices("COMANI_MODEL_DIR", "model_dir"))
+    workflow_dir: Path | None = Field(default=examples_dir / "workflows", validation_alias=AliasChoices("COMANI_WORKFLOW_DIR", "workflow_dir"))
+    preset_dir: Path | None = Field(default=examples_dir / "presets", validation_alias=AliasChoices("COMANI_PRESET_DIR", "preset_dir"))
+
+    # API Keys (No COMANI_ prefix in env usually, but we support both)
+    xai_api_key: SecretStr | None = Field(default=None, validation_alias=AliasChoices("XAI_API_KEY", "COMANI_XAI_API_KEY"))
+    civitai_api_token: SecretStr | None = Field(
+        default=None, validation_alias=AliasChoices("CIVITAI_API_TOKEN", "COMANI_CIVITAI_API_TOKEN")
+    )
+    hf_api_token: SecretStr | None = Field(
+        default=None, validation_alias=AliasChoices("HF_API_TOKEN", "HF_TOKEN", "COMANI_HF_API_TOKEN")
+    )
+
+    model_config = SettingsConfigDict(
+        env_prefix="COMANI_",
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
+
+    @field_validator("comfyui_root", mode="before")
+    @classmethod
+    def convert_to_path(cls, v: Any) -> Path:
+        """Convert string paths to Path objects."""
+        if isinstance(v, str):
+            return Path(v)
+        return v
 
     @property
     def comfyui_url(self) -> str:
-        return f"http://{self.server_ip}:{self.server_port}"
+        """Get ComfyUI server URL."""
+        return f"http://{self.host}:{self.comfyui_port}"
 
-    def ensure_directories(self) -> None:
-        """Ensure all directories exist, copy defaults if needed."""
-        default_dirs = {
-            "models": get_default_dir("models"),
-            "workflows": get_default_dir("workflows"),
-            "presets": get_default_dir("presets"),
-        }
-
-        for name, (target, default) in [
-            ("models", (self.model_config_dir, default_dirs["models"])),
-            ("workflows", (self.workflow_dir, default_dirs["workflows"])),
-            ("presets", (self.preset_dir, default_dirs["presets"])),
-        ]:
-            if target != default and not target.exists():
-                target.mkdir(parents=True, exist_ok=True)
-                if default.exists():
-                    for item in default.iterdir():
-                        dest = target / item.name
-                        if item.is_file():
-                            shutil.copy2(item, dest)
-                        elif item.is_dir():
-                            shutil.copytree(item, dest)
-                print(f"Copied default {name} to {target}")
-            elif not target.exists():
-                target.mkdir(parents=True, exist_ok=True)
-
+    @property
+    def auth(self) -> tuple[str, str] | None:
+        """Get ComfyUI auth credentials if set."""
+        if self.comfyui_auth_user and self.comfyui_auth_pass:
+            return (self.comfyui_auth_user, self.comfyui_auth_pass.get_secret_value())
+        return None
 
 _config: ComaniConfig | None = None
 
@@ -75,10 +75,3 @@ def get_config() -> ComaniConfig:
     if _config is None:
         _config = ComaniConfig()
     return _config
-
-
-def init_config() -> ComaniConfig:
-    """Initialize config and ensure directories exist."""
-    config = get_config()
-    config.ensure_directories()
-    return config

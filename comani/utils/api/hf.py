@@ -1,12 +1,12 @@
 """
 HuggingFace API utilities.
 """
-import os
 import re
 from dataclasses import dataclass
 from urllib.parse import unquote
 
 import requests
+from comani.config import get_config
 
 REQUEST_TIMEOUT = 30
 
@@ -20,7 +20,12 @@ class _TokenStore:
     @property
     def token(self) -> str:
         if self._token is None:
-            self._token = os.environ.get("HF_API_TOKEN", "") or os.environ.get("HF_TOKEN", "")
+            config = get_config()
+            if config.hf_api_token:
+                self._token = config.hf_api_token.get_secret_value()
+            else:
+                self._token = ""
+
             if not self._token:
                 print("Warning: HF_API_TOKEN not set. Some HuggingFace downloads may fail.")
                 print("  Get token: https://huggingface.co/settings/tokens")
@@ -31,10 +36,12 @@ _tokens = _TokenStore()
 
 
 def get_token() -> str:
+    """Get the HuggingFace API token."""
     return _tokens.token
 
 
 def get_auth_headers() -> dict:
+    """Get the authentication headers for HuggingFace API."""
     token = get_token()
     return {"Authorization": f"Bearer {token}"} if token else {}
 
@@ -88,4 +95,15 @@ def list_repo_files(repo_id: str, skip: set[str] | None = None) -> list[str]:
 
 
 def build_file_url(repo_id: str, file_path: str, revision: str = "main") -> str:
+    """Build a HuggingFace file download URL."""
     return f"https://huggingface.co/{repo_id}/resolve/{revision}/{file_path}"
+
+
+__all__ = [
+    "get_token",
+    "get_auth_headers",
+    "parse_hf_file_url",
+    "list_repo_files",
+    "build_file_url",
+    "HFFileInfo",
+]

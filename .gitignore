@@ -1,6 +1,9 @@
 # Dev
 playground/
 codebase.md
+.cursor/
+.trae/
+.env
 
 # Python
 __pycache__/
@@ -24,6 +27,7 @@ wheels/
 .installed.cfg
 *.egg
 .pytest_cache/
+.ruff_cache/
 
 # Virtual environments
 .venv/

@@ -5,13 +5,14 @@ CLI commands for Comani.
 import argparse
 import json
 import sys
-from pathlib import Path
+import os
 from typing import Any
 
-from ..core.engine import ComaniEngine
-from ..core.model_pack import ModelPackRegistry, ModelDef, ResolvedGroup
+from comani.core.engine import ComaniEngine
+from comani.model.model_pack import ModelPackRegistry, ResolvedGroup
+from comani.config import get_config
 
-MODELS_ROOT = Path(__file__).parent.parent / "models"
+MODELS_ROOT = get_config().model_dir
 
 
 def print_json(data: Any) -> None:
@@ -182,54 +183,91 @@ def _interactive_select(registry: ModelPackRegistry) -> str | None:
         ("separator", "fg:gray"),
     ])
 
-    modules = registry.list_modules()
-    if not modules:
-        print("No model packs found.")
-        return None
+    def _get_package_inners(package: str = "") -> list[str]:
+        """Get all inner packages and modules."""
+        inners = registry.list_package_inners(package)
+        packages = [m[:-1].rsplit(".", 1)[-1]+"." for m in inners if m.endswith(".")]
+        modules = [m.rsplit(".", 1)[-1] for m in inners if not m.endswith(".")]
+        return [".."] + packages + modules
 
-    # First select module
-    module_choices = [questionary.Choice(title=m, value=m) for m in modules]
-    selected_module = questionary.select(
-        "Select module:",
-        choices=module_choices,
-        style=style,
-    ).ask()
+    def _clear_line():
+        sys.stdout.write("\033[F\033[K")
+        sys.stdout.flush()
 
-    if not selected_module:
-        return None
+    current_package = "."
+    model_dir_name = os.path.basename(get_config().model_dir)
 
-    # Then select model or group
-    choices = []
+    while True:
+        # print(f"current package: {current_package}")
+        inners = _get_package_inners(current_package)
+        # print(f"inners: {inners}")
 
-    # Add "all" option
-    choices.append(questionary.Choice(
-        title=f"[ALL] Download entire {selected_module}",
-        value=selected_module
-    ))
+        inner_choices = [questionary.Choice(title=m, value=m) for m in inners]
+        selected_inner = questionary.select(
+            "Location: " + model_dir_name + current_package,
+            choices=inner_choices,
+            style=style,
+        ).ask()
+        if not selected_inner:
+            break
+        _clear_line()
 
-    # Add groups
-    groups = registry.list_groups(selected_module)
-    for group in groups:
+        if selected_inner == "..":
+            if current_package == ".":
+                break
+            # Go back to package selection
+            current_package = current_package[:-1].rsplit(".", 1)[-2]+"."
+            continue
+
+        if selected_inner.endswith("."):
+            # Add models
+            current_package += selected_inner
+            continue
+
+        # Then select model or group
+        current_module = current_package + selected_inner
+
+        choices = []
+        # Add back option
         choices.append(questionary.Choice(
-            title=f"[GROUP] {group.id}: {group.description}",
-            value=f"{selected_module}.{group.id}"
+            title="..",
+            value=".."
         ))
 
-    # Add models
-    models = registry.list_models(selected_module)
-    for model in models:
+        # Add "all" option
         choices.append(questionary.Choice(
-            title=f"[MODEL] {model.id}",
-            value=f"{selected_module}.{model.id}"
+            title=f"[ALL] Download entire {current_module}",
+            value=current_module
         ))
 
-    selection = questionary.select(
-        f"Select from {selected_module}:",
-        choices=choices,
-        style=style,
-    ).ask()
+        # Add groups
+        groups = registry.list_groups(current_module)
+        for group in groups:
+            choices.append(questionary.Choice(
+                title=f"[GROUP] {group.id}: {group.description}",
+                value=f"{current_module}.{group.id}"
+            ))
 
-    return selection
+        # Add models
+        models = registry.list_models(current_module)
+        for model in models:
+            choices.append(questionary.Choice(
+                title=f"[MODEL] {model.id}",
+                value=f"{current_module}.{model.id}"
+            ))
+
+        selection = questionary.select(
+            "Location: " + model_dir_name + current_module,
+            choices=choices,
+            style=style,
+        ).ask()
+        if not selection:
+            break
+        _clear_line()
+
+        if selection == "..":
+            continue  # Go back to module selection
+        return selection
 
 
 def cmd_model_list(args: argparse.Namespace) -> int:
@@ -265,91 +303,35 @@ def cmd_model_list(args: argparse.Namespace) -> int:
 
     return 0
 
-
 def cmd_model_download(args: argparse.Namespace) -> int:
-    """Download models."""
-    registry = _get_registry()
+    """Download models using unified downloader (via Engine)."""
     engine = ComaniEngine()
-    comfyui_root = args.comfyui_root
+    try:
+        targets = args.targets if args.targets else []
 
-    targets = args.targets if args.targets else []
+        # Interactive mode
+        if not targets:
+            if not (sys.stdin.isatty() and sys.stdout.isatty()):
+                print("Error: Interactive mode requires a terminal.")
+                print("Use 'comani model list' to see available models.")
+                return 1
 
-    # Interactive mode
-    if not targets:
-        if not (sys.stdin.isatty() and sys.stdout.isatty()):
-            print("Error: Interactive mode requires a terminal.")
+            print("🎨 ComfyUI Model Downloader")
+            print("=" * 40)
+            target = _interactive_select(engine.model_pack_registry)
+            if not target:
+                return 0
+            targets = [target]
+
+        if not targets:
+            print("Error: Please specify targets to download.")
             print("Use 'comani model list' to see available models.")
             return 1
 
-        print("🎨 ComfyUI Model Downloader")
-        print("=" * 40)
-        target = _interactive_select(registry)
-        if not target:
-            return 0
-        targets = [target]
-
-    # Resolve targets to models
-    if len(targets) == 1:
-        resolved = registry.resolve_to_group(targets[0])
-        if not resolved.models:
-            print(f"Error: No models found for '{targets[0]}'")
-            return 1
-
-        print(f"\n📦 Downloading: {resolved.id}")
-        print(f"   {resolved.description}")
-        print(f"   {len(resolved.models)} model(s) to download\n")
-    else:
-        # Multiple targets
-        resolved, ref_info = registry.resolve_multiple(targets)
-
-        if not resolved.models:
-            print("Error: No models found for any of the specified targets")
-            return 1
-
-        print("\n📋 Target Analysis:")
-        print("-" * 40)
-        for ref, ref_type, count in ref_info:
-            _print_ref_info(ref, ref_type, count)
-
-        print("\n" + "=" * 40)
-        print(f"📊 Total: {len(resolved.models)} unique models to download")
-        print("=" * 40 + "\n")
-
-    if args.dry_run:
-        print("[DRY-RUN] Would download:")
-        for model in resolved.models:
-            print(f"  - {model.source_module}.{model.id}: {model.path}")
-        return 0
-
-    # Download using engine
-    downloader = engine.get_downloader(comfyui_root)
-    specs = _models_to_download_specs(resolved.models)
-    downloader.download_spec(resolved.id, specs)
-
-    return 0
-
-
-def _models_to_download_specs(models: list[ModelDef]) -> dict[str, list[dict]]:
-    """Convert ModelDef list to download spec format."""
-    specs: dict[str, list[dict]] = {}
-
-    for model in models:
-        # Extract subdir from path (e.g., "models/vae/xxx.safetensors" -> "vae")
-        path_parts = model.path.split("/")
-        if len(path_parts) >= 2 and path_parts[0] == "models":
-            subdir = path_parts[1]
-        else:
-            subdir = "checkpoints"
-
-        if subdir not in specs:
-            specs[subdir] = []
-
-        specs[subdir].append({
-            "url": model.url,
-            "name": path_parts[-1] if path_parts else model.id,
-        })
-
-    return specs
+        success = engine.download_models(targets, dry_run=args.dry_run)
+        return 0 if success else 1
+    finally:
+        engine.close()
 
 
 def cmd_model(args: argparse.Namespace) -> int:
@@ -361,6 +343,87 @@ def cmd_model(args: argparse.Namespace) -> int:
     else:
         print("Error: Unknown action. Use 'list' or 'download'.")
         return 1
+
+
+# =========================================================================
+# Chat Commands (Grok API integration)
+# =========================================================================
+
+def cmd_chat(args: argparse.Namespace) -> int:
+    """Chat with Grok AI using grok-api."""
+    from grok_api.core import Grok
+
+    try:
+        client = Grok(model=args.model)
+    except Exception as e:
+        print(f"Error initializing Grok: {e}")
+        return 1
+
+    extra_data = None
+
+    # Handle initial prompt
+    if args.prompt:
+        prompt = args.prompt
+        if args.system:
+            prompt = f"System: {args.system}\n\nUser: {prompt}"
+
+        print("🤖 Grok: ", end="", flush=True)
+        try:
+            for chunk in client.chat_stream(prompt):
+                if chunk.get("error"):
+                    print(f"\nError: {chunk['error']}")
+                    return 1
+                if chunk.get("token"):
+                    print(chunk["token"], end="", flush=True)
+            print() # Newline after response
+            return 0
+        except Exception as e:
+            print(f"\nError during chat: {e}")
+            return 1
+
+    # Interactive mode
+    print("🤖 Grok Chat (type 'exit' to quit)")
+    print("=" * 40)
+
+    while True:
+        try:
+            user_input = input("\n👤 You: ").strip()
+            if user_input.lower() in ("exit", "quit", "q"):
+                print("Goodbye!")
+                break
+            if not user_input:
+                continue
+
+            prompt = user_input
+            if extra_data is None and args.system:
+                prompt = f"System: {args.system}\n\nUser: {user_input}"
+
+            print("🤖 Grok: ", end="", flush=True)
+
+            last_meta = None
+            for chunk in client.chat_stream(prompt, extra_data=extra_data):
+                if chunk.get("error"):
+                    print(f"\nError: {chunk['error']}")
+                    break
+                if chunk.get("token"):
+                    print(chunk["token"], end="", flush=True)
+                if chunk.get("meta"):
+                    last_meta = chunk["meta"]
+
+            print() # Newline after response
+            if last_meta:
+                extra_data = last_meta.get("extra_data")
+
+        except KeyboardInterrupt:
+            print("\nGoodbye!")
+            break
+        except EOFError:
+            print("\nGoodbye!")
+            break
+        except Exception as e:
+            print(f"\nError: {e}")
+
+    return 0
 
 
 def main() -> int:
@@ -421,6 +484,13 @@ def main() -> int:
     model_download_parser.add_argument("--comfyui-root", help="ComfyUI directory path")
     model_download_parser.add_argument("--dry-run", action="store_true", help="Show what would be downloaded without downloading")
 
+    # chat - Grok API integration
+    chat_parser = subparsers.add_parser("chat", help="Chat with Grok AI")
+    chat_parser.add_argument("prompt", nargs="?", help="Prompt to send (omit for interactive mode)")
+    chat_parser.add_argument("-s", "--system", help="System prompt")
+    chat_parser.add_argument("-m", "--model", default="grok-3-fast", help="Model to use (default: grok-3-fast)")
+    chat_parser.add_argument("--no-thinking", action="store_true", help="Hide thinking/reasoning output")
+
     args = parser.parse_args()
 
     if not args.command:
@@ -436,6 +506,7 @@ def main() -> int:
         "interrupt": cmd_interrupt,
         "clear": cmd_clear,
         "model": cmd_model,
+        "chat": cmd_chat,
     }
 
     handler = commands.get(args.command)

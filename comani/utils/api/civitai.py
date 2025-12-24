@@ -1,14 +1,17 @@
 """
-Civitai Collection utilities.
-Fetch and export models from Civitai collections.
+Civitai API and Collection utilities.
 """
 import json
-import os
 import re
 import time
+from dataclasses import dataclass
+from urllib.parse import urlparse, parse_qs
 
 import requests
 import yaml
+from comani.config import get_config
+
+REQUEST_TIMEOUT = 30
 
 # Civitai model type to ComfyUI directory mapping
 MODEL_TYPE_MAP = {
@@ -25,6 +28,127 @@ MODEL_TYPE_MAP = {
     "MotionModule": "animatediff_models",
     "AestheticGradient": "aesthetic_embeddings",
 }
+
+
+class _TokenStore:
+    """Lazy-loaded Civitai token with one-time warning."""
+
+    def __init__(self):
+        self._token: str | None = None
+
+    @property
+    def token(self) -> str:
+        if self._token is None:
+            config = get_config()
+            if config.civitai_api_token:
+                self._token = config.civitai_api_token.get_secret_value()
+            else:
+                self._token = ""
+
+            if not self._token:
+                print("Warning: CIVITAI_API_TOKEN not set. Civitai downloads may fail.")
+                print("  Get token: https://civitai.com/user/account -> API Keys")
+        return self._token
+
+
+_tokens = _TokenStore()
+
+
+def get_token() -> str:
+    """Get the Civitai API token."""
+    return _tokens.token
+
+
+@dataclass(frozen=True)
+class CivitaiFileInfo:
+    """Parsed Civitai file download info."""
+    version_id: str
+    filename: str
+    download_url: str
+    headers: dict
+
+
+def get_version_info(url: str) -> tuple[str, str]:
+    """
+    Extract version_id and filename from Civitai URL.
+    Supports: model page URLs, versioned URLs, api/download URLs.
+    """
+    parsed = urlparse(url)
+    query = parse_qs(parsed.query)
+
+    version_id: str | None = query.get("modelVersionId", [None])[0]
+    model_id: str | None = None
+
+    if not version_id:
+        # Check for api/download URL format: /api/download/models/{version_id}
+        api_download_match = re.search(r"/api/download/models/(\d+)", url)
+        if api_download_match:
+            version_id = api_download_match.group(1)
+        else:
+            # Standard model page URL: /models/{model_id}
+            match = re.search(r"/models/(\d+)", url)
+            if not match:
+                raise ValueError(f"Invalid Civitai URL: {url}")
+            model_id = match.group(1)
+
+    # Fetch version info from API
+    if version_id:
+        api_url = f"https://civitai.com/api/v1/model-versions/{version_id}"
+    else:
+        api_url = f"https://civitai.com/api/v1/models/{model_id}"
+
+    resp = requests.get(api_url, timeout=REQUEST_TIMEOUT)
+    resp.raise_for_status()
+    data = resp.json()
+
+    if not version_id:
+        # Get first version from model response
+        version_data = data["modelVersions"][0]
+        version_id = str(version_data["id"])
+    else:
+        version_data = data
+
+    # Extract filename from files array
+    files = version_data.get("files", [])
+    filename = files[0]["name"] if files else f"model_{version_id}.safetensors"
+
+    return version_id, filename
+
+
+def parse_civitai_url(url: str) -> CivitaiFileInfo:
+    """Parse Civitai URL into download info."""
+    version_id, filename = get_version_info(url)
+
+    download_url = f"https://civitai.com/api/download/models/{version_id}"
+    token = get_token()
+    if token:
+        download_url = f"{download_url}?token={token}"
+
+    return CivitaiFileInfo(
+        version_id=version_id,
+        filename=filename,
+        download_url=download_url,
+        headers={},
+    )
+
+
+def get_model_info(model_id: str | int) -> dict | None:
+    """Fetch model info from Civitai API."""
+    api_url = f"https://civitai.com/api/v1/models/{model_id}"
+    headers = {"User-Agent": "Mozilla/5.0"}
+    token = get_token()
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+
+    try:
+        resp = requests.get(api_url, headers=headers, timeout=REQUEST_TIMEOUT)
+        if resp.status_code != 200:
+            print(f"  ⚠️  Failed to fetch model {model_id}: {resp.status_code}")
+            return None
+        return resp.json()
+    except Exception as e:
+        print(f"  ❌ Error requesting model {model_id}: {e}")
+        return None
 
 
 def get_collection_items(collection_id: int, api_token: str | None = None) -> list[dict]:
@@ -137,12 +261,6 @@ def get_collection_items(collection_id: int, api_token: str | None = None) -> li
     return all_items
 
 
-def get_model_info(model_id: str | int, api_token: str | None = None) -> dict | None:
-    """Fetch model info from Civitai API."""
-    from .api import get_model_info as api_get_model_info
-    return api_get_model_info(model_id)
-
-
 def export_models(
     collection_id: int,
     output_file: str = "collection_models.yml",
@@ -153,7 +271,10 @@ def export_models(
     Export collection models to a YML dict grouped by model type.
     Example: export_models(123456, prefix="my_") generates {loras: [{url: ..., filename: my_xxx.safetensors}]}
     """
-    api_token = api_token or os.environ.get("CIVITAI_API_TOKEN")
+    if not api_token:
+        config = get_config()
+        if config.civitai_api_token:
+            api_token = config.civitai_api_token.get_secret_value()
     items = get_collection_items(collection_id, api_token)
 
     model_items = [item for item in items if item["type"] == "model"]
@@ -171,7 +292,7 @@ def export_models(
         model_id = match.group(1)
         print(f"  [{i}/{len(model_items)}] Fetching model {model_id}: {item['name'][:40]}...")
 
-        info = get_model_info(model_id, api_token)
+        info = get_model_info(model_id)
         if not info:
             continue
 
@@ -180,12 +301,12 @@ def export_models(
 
         versions = info.get("modelVersions", [])
         if not versions:
-            print(f"    ⚠️  No version info")
+            print("    ⚠️  No version info")
             continue
 
         files = versions[0].get("files", [])
         if not files:
-            print(f"    ⚠️  No file info")
+            print("    ⚠️  No file info")
             continue
 
         original_filename = files[0].get("name", f"model_{model_id}.safetensors")
@@ -212,33 +333,12 @@ def export_models(
     return result
 
 
-def main():
-    import argparse
-
-    parser = argparse.ArgumentParser(description="Civitai Collection Tools")
-    parser.add_argument("collection_id", type=int, help="Collection ID to fetch")
-    parser.add_argument("--export", type=str, choices=["model"], help="Export type: model")
-    parser.add_argument("--prefix", type=str, default="", help="Filename prefix for exported models")
-    parser.add_argument("--output", type=str, default="collection_models.yml", help="Output YML file")
-    args = parser.parse_args()
-
-    api_token = os.environ.get("CIVITAI_API_TOKEN")
-
-    if args.export == "model":
-        export_models(
-            args.collection_id,
-            output_file=args.output,
-            prefix=args.prefix,
-            api_token=api_token,
-        )
-    else:
-        items = get_collection_items(args.collection_id, api_token=api_token)
-        if items:
-            with open("collection_list.txt", "w", encoding="utf-8") as f:
-                for item in items:
-                    f.write(f"[{item['type']}] {item['name']}: {item['url']}\n")
-            print(f"\nResults saved to collection_list.txt")
-
-
-if __name__ == "__main__":
-    main()
+__all__ = [
+    "get_token",
+    "get_version_info",
+    "parse_civitai_url",
+    "get_model_info",
+    "CivitaiFileInfo",
+    "get_collection_items",
+    "export_models",
+]

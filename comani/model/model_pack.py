@@ -16,7 +16,6 @@ Reference format (Python-like dot notation):
   - "package.module.group_id" - reference a group
 """
 
-import fnmatch
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -71,15 +70,71 @@ class ModelPackRegistry:
         self._models: dict[str, ModelDef] = {}  # {qualified_id: ModelDef}
         self._groups: dict[str, GroupDef] = {}  # {qualified_id: GroupDef}
         self._module_models: dict[str, list[str]] = {}  # {module_name: [model_ids]}
-        self._packages: set[str] = set()  # track packages (directories)
+        self._packages: dict[str, list[str]] = {}  # {package_name: [package_name/module_name...]}
         self._loaded = False
+
+    def _track_module_package(self, module_name: str) -> None:  # Right logic. Don't modify.
+        """Track a module in its package hierarchy. Collect all packages that include the module."""
+        # Track package (package always ends with ".", "." is root)
+        parent_package = module_name.rsplit(".", 1)[-2] + "."
+        child_item = module_name
+        while parent_package not in self._packages:
+            self._packages[parent_package] = []
+            self._packages[parent_package].append(child_item)
+            if parent_package == ".":
+                break
+            child_item = parent_package
+            parent_package = parent_package[:-1].rsplit(".", 1)[-2] + "."
+        else:
+            self._packages[parent_package].append(child_item)
+        # print(self._packages)
+        # print(self._module_models.keys())
+
+    def load_from_dict(self, data: dict, module_name: str) -> None:
+        """
+        Load model pack data from a dictionary.
+
+        Args:
+            data: Model pack data
+            module_name: Name of the module (e.g., ".sdxl")
+        """
+        # Ensure module name starts with "."
+        if not module_name.startswith("."):
+            module_name = "." + module_name
+
+        self._module_models[module_name] = []
+
+        # Track package
+        self._track_module_package(module_name)
+
+        # Parse models
+        models_data = data.get("models", {})
+        if isinstance(models_data, dict):
+            for model_id, entry in models_data.items():
+                qualified_id = f"{module_name}.{model_id}"
+                model_def = self._parse_model_entry(entry, model_id, module_name)
+                self._models[qualified_id] = model_def
+                self._module_models[module_name].append(model_id)
+
+        # Parse groups
+        groups_data = data.get("groups", {})
+        if isinstance(groups_data, dict):
+            for group_id, entry in groups_data.items():
+                qualified_id = f"{module_name}.{group_id}"
+                group_def = GroupDef(
+                    id=group_id,
+                    description=entry.get("description", ""),
+                    includes=entry.get("includes", []),
+                    source_module=module_name,
+                )
+                self._groups[qualified_id] = group_def
 
     def _path_to_module(self, yml_path: Path) -> str:
         """Convert a YAML file path to module name (Python-like)."""
         rel_path = yml_path.relative_to(self.models_dir)
         # Remove .yml/.yaml suffix and convert / to .
         stem = rel_path.with_suffix("")
-        return str(stem).replace("/", ".").replace("\\", ".")
+        return "." + str(stem).replace("/", ".").replace("\\", ".")
 
     def _parse_model_entry(self, entry: dict | list, model_id: str, module_name: str) -> ModelDef:
         """Parse a single model entry from YAML."""
@@ -147,10 +202,8 @@ class ModelPackRegistry:
         module_name = self._path_to_module(yml_path)
         self._module_models[module_name] = []
 
-        # Track package (top-level directory or root for top-level files)
-        parts = module_name.split(".")
-        if len(parts) > 1:
-            self._packages.add(parts[0])
+        # Track package
+        self._track_module_package(module_name)
 
         # Parse models section
         models_data = data.get("models", {})
@@ -228,6 +281,11 @@ class ModelPackRegistry:
         if not self._loaded:
             self._load_all()
 
+    def list_package_inners(self, package: str) -> list[str]:
+        """List all modules and packages under specified package."""
+        self._ensure_loaded()
+        return self._packages.get(package, [])
+
     def list_modules(self) -> list[str]:
         """List all loaded module names (Python-like)."""
         self._ensure_loaded()
@@ -236,7 +294,7 @@ class ModelPackRegistry:
     def list_packages(self) -> list[str]:
         """List all packages (directories with modules)."""
         self._ensure_loaded()
-        return list(self._packages)
+        return list(self._packages.keys())
 
     def list_models(self, module_name: str | None = None) -> list[ModelDef]:
         """List all models, optionally filtered by module."""
@@ -473,7 +531,7 @@ class ModelPackRegistry:
         else:
             model = self.get_model(ref)
             if model:
-                description = model.description + f"Model from {model.url}\n   Download to {model.path}"
+                description = model.description + f"url: {model.url}\n   path: {model.path}"
                 group_id = f"{model.source_module}.{model.id}"
             elif ref in self._module_models:
                 description = f"All models from module: {ref}"
@@ -551,6 +609,6 @@ class ModelPackRegistry:
         return "unknown"
 
     # Legacy compatibility aliases
-    def list_files(self) -> list[str]:
+    def list_packainner(self) -> list[str]:
         """Alias for list_modules() for backwards compatibility."""
         return self.list_modules()

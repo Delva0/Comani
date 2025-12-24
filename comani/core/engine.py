@@ -2,15 +2,16 @@
 Comani engine - main orchestrator for workflow execution.
 """
 
-from pathlib import Path
 from typing import Any
 
-from ..config import init_config, get_config, ComaniConfig
-from .client import ComfyUIClient, ComfyUIResult
-from .preset import PresetManager
-from .executor import WorkflowLoader, Executor
-from .downloader import ModelDownloader
-from .dependency import DependencyResolver
+from comani.config import get_config, ComaniConfig
+from comani.core.client import ComfyUIClient, ComfyUIResult
+from comani.core.preset import PresetManager
+from comani.core.executor import WorkflowLoader, Executor
+from comani.model.model_dependency import DependencyResolver
+from comani.model.model_pack import ModelPackRegistry
+from comani.model.download import ModelDownloader
+from comani.utils.download import get_downloader
 
 
 class ComaniEngine:
@@ -20,17 +21,59 @@ class ComaniEngine:
     """
 
     def __init__(self, config: ComaniConfig | None = None):
-        self.config = config or init_config()
-        self.client = ComfyUIClient(self.config.comfyui_url)
+        self.config = config or get_config()
+        self.client = ComfyUIClient(self.config.comfyui_url, auth=self.config.auth)
         self.preset_manager = PresetManager(self.config.preset_dir)
         self.workflow_loader = WorkflowLoader(self.config.workflow_dir)
-        self.dependency_resolver = DependencyResolver()
+
+        # Initialize registry and dependency resolver
+        self._downloader = None
+        self.model_pack_registry = ModelPackRegistry(self.config.model_dir)
+        self.dependency_resolver = DependencyResolver(
+            self.config.model_dir,
+            registry=self.model_pack_registry,
+        )
         self.executor = Executor(
             self.client,
             self.workflow_loader,
             self.preset_manager,
             self.dependency_resolver,
         )
+
+    def _create_downloader(self) -> ModelDownloader:
+        """Create a new ModelDownloader instance."""
+        inner_downloader = get_downloader()
+        # Model paths in YAML are relative to comfyui_root (e.g., "models/checkpoints/...")
+        downloader = ModelDownloader(inner_downloader, self.config.comfyui_root)
+        self.dependency_resolver.set_downloader(downloader)
+        return downloader
+
+    @property
+    def downloader(self) -> ModelDownloader:
+        """Get the singleton model downloader instance."""
+        if self._downloader is None:
+            self._downloader = self._create_downloader()
+            # Active downloader (connect if needed)
+            if hasattr(self._downloader, "__enter__"):
+                self._downloader.__enter__()
+        return self._downloader
+
+    def download_models(self, targets: list[str], dry_run: bool = False) -> bool:
+        """Download models specified by targets."""
+        return self.downloader.download_by_ids(targets, model_pack_registry=self.model_pack_registry, dry_run=dry_run)
+
+    def close(self) -> None:
+        """Cleanup resources including downloader."""
+        if self._downloader:
+            if hasattr(self._downloader, "__exit__"):
+                self._downloader.__exit__(None, None, None)
+            self._downloader = None
+
+    def __del__(self):
+        try:
+            self.close()
+        except Exception:
+            pass
 
     def health_check(self) -> dict[str, Any]:
         """Check engine and ComfyUI status."""
@@ -86,39 +129,3 @@ class ComaniEngine:
     def get_history(self, prompt_id: str | None = None) -> dict[str, Any]:
         """Get execution history."""
         return self.client.get_history(prompt_id)
-
-    # =========================================================================
-    # Model Download API
-    # =========================================================================
-
-    def get_downloader(self, comfyui_root: Path | str | None = None) -> ModelDownloader:
-        """
-        Get a model downloader instance.
-        Example: downloader = engine.get_downloader("/workspace/ComfyUI")
-        """
-        return ModelDownloader(comfyui_root)
-
-    def download_models(
-        self,
-        name: str,
-        specs: dict[str, list[str | dict[str, str]]],
-        comfyui_root: Path | str | None = None,
-    ) -> None:
-        """
-        Download models by spec dict.
-        Example: engine.download_models("WAN 2.2", {"vae": ["https://..."]})
-        """
-        downloader = self.get_downloader(comfyui_root)
-        downloader.download_spec(name, specs)
-
-    def download_models_yml(
-        self,
-        yml_path: Path | str,
-        comfyui_root: Path | str | None = None,
-    ) -> None:
-        """
-        Download models from YML config file.
-        Example: engine.download_models_yml("models/wan.yml")
-        """
-        downloader = self.get_downloader(comfyui_root)
-        downloader.download_yml(yml_path)
