@@ -30,13 +30,13 @@ class TestModelDownloaderCore:
         return downloader
 
     def test_model_downloader_init(self, mock_downloader):
-        from comani.model.download import ModelDownloader
+        from comani.model.model_downloader import ModelDownloader
         dl = ModelDownloader(mock_downloader, "/tmp")
         assert dl._downloader is mock_downloader
         assert str(dl._base_path) == "/tmp"
 
     def test_model_downloader_create(self):
-        from comani.model.download import ModelDownloader
+        from comani.model.model_downloader import ModelDownloader
         from comani.utils.download import RequestsDownloader
         from comani.utils.connection.node import ExecResult
 
@@ -52,7 +52,7 @@ class TestModelDownloaderCore:
                 assert str(dl._base_path) == "/tmp"
 
     def test_model_downloader_close(self, mock_downloader):
-        from comani.model.download import ModelDownloader
+        from comani.model.model_downloader import ModelDownloader
         dl = ModelDownloader(mock_downloader, "/tmp")
         dl.close()
         mock_downloader.close.assert_called_once()
@@ -70,7 +70,7 @@ class TestModelDownloaderIntegration:
 
     def test_download_boleromix_illustrious(self, temp_dir, monkeypatch):
         """Test downloading boleromix_illustrious using high-level API."""
-        from comani.model.download import ModelDownloader
+        from comani.model.model_downloader import ModelDownloader
         from comani.model.model_pack import ModelPackRegistry
 
         # Mock config and environment
@@ -95,7 +95,7 @@ class TestModelDownloaderIntegration:
         mock_downloader.close = Mock()
 
         # We need to mock resolve_download because it calls external APIs (Civitai)
-        from comani.model.download import ResolvedDownloadItem
+        from comani.model.model_downloader import ResolvedDownloadItem
         resolved_item = ResolvedDownloadItem(
             url="https://civitai.com/api/download/models/1412789",
             filepath="boleromix_illustrious.safetensors",

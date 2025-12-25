@@ -10,8 +10,9 @@ Resolves dependencies using ModelPackRegistry with Python-like naming:
 from dataclasses import dataclass
 from pathlib import Path
 
-from comani.model.download import ModelDownloader
+from comani.model.model_downloader import ModelDownloader
 from comani.model.model_pack import ModelPackRegistry, ModelDef
+from comani.utils.download import get_downloader
 
 
 @dataclass
@@ -37,18 +38,18 @@ class DependencyResolver:
 
     def __init__(
         self,
-        model_config_dir: Path | str | None = None,
+        model_config_dir: Path | str | None,
         registry: ModelPackRegistry | None = None,
         downloader: ModelDownloader | None = None,
     ):
-        if model_config_dir:
-            self.model_config_dir = Path(model_config_dir).resolve()
-        else:
-            from comani.config import comfyui_root
-            self.model_config_dir = comfyui_root / "models"
+        if not model_config_dir and not registry:
+            raise ValueError("Either model_config_dir or registry must be provided")
 
         # Use injected registry or create new one
+        if model_config_dir:
+            self.model_config_dir = Path(model_config_dir).resolve()
         self.registry = registry or ModelPackRegistry(self.model_config_dir)
+
         self._downloader: ModelDownloader | None = downloader
 
     def set_downloader(self, downloader: ModelDownloader) -> None:
@@ -58,7 +59,9 @@ class DependencyResolver:
     def _get_downloader(self) -> ModelDownloader:
         """Get or create ModelDownloader instance."""
         if self._downloader is None:
-            raise DependencyError("Downloader not set. Call set_downloader() first.")
+            from comani.config import get_config
+            config = get_config()
+            self._downloader = ModelDownloader(get_downloader(), config.comfyui_root)
         return self._downloader
 
     def _resolve_single_ref(
@@ -122,8 +125,29 @@ class DependencyResolver:
                 print(f"  - {dep.name} -> {dep.path}")
             return resolved
 
+        # Pre-check: if all files already exist, skip downloader initialization
+        from comani.utils.connection.node import get_node
+        from comani.config import get_config
+        node = get_node()
+        comfyui_root = get_config().comfyui_root
+
+        missing_models = []
+        for dep in resolved:
+            if not dep.model_def:
+                continue
+            full_path = comfyui_root / dep.model_def.path
+            if not node.exists(str(full_path)):
+                missing_models.append(dep.model_def.id)
+
+        if not missing_models:
+            # All models exist, no need to initialize downloader
+            return resolved
+
         downloader = self._get_downloader()
-        downloader.download_by_ids([d.model_def.id for d in resolved if d.model_def])
+        downloader.download_by_ids(
+            missing_models,
+            model_pack_registry=self.registry
+        )
 
         return resolved
 

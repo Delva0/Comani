@@ -17,9 +17,11 @@ import tempfile
 import textwrap
 import uuid
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Any, Callable, Optional, Union
 
 from comani.utils.connection.ssh import SSHConnection
+from comani.config import get_config
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +50,9 @@ class Node(abc.ABC):
 
     @abc.abstractmethod
     def get(self, remote_path: str, local_path: str) -> None: ...
+
+    @abc.abstractmethod
+    def exists(self, path: str) -> bool: ...
 
     @abc.abstractmethod
     def close(self) -> None: ...
@@ -97,6 +102,9 @@ class LocalNode(Node):
         if os.path.abspath(remote_path) != os.path.abspath(local_path):
             shutil.copy2(remote_path, local_path)
 
+    def exists(self, path: str) -> bool:
+        return os.path.exists(path)
+
     def close(self) -> None: pass
 
 class RemoteNode(Node):
@@ -140,6 +148,10 @@ class RemoteNode(Node):
     def get(self, remote_path: str, local_path: str) -> None:
         self.conn.sftp.get(remote_path, local_path)
 
+    def exists(self, path: str) -> bool:
+        res = self.exec_shell(f"test -f '{path}'")
+        return res.ok
+
     def close(self) -> None:
         self.conn.close()
 
@@ -169,6 +181,7 @@ if __name__ == '__main__':
         sys.exit(1)
 """
 
+@lru_cache(maxsize=1)  # 如果paramiko提供了ssh复用+连接失败自动创建新ssh conn，那么这里不再需要缓存
 def connect_node(
     host: str = None,
     ssh_user: str = "root",
@@ -186,3 +199,15 @@ def connect_node(
 
     logger.debug(f"Connecting to RemoteNode: {host}")
     return RemoteNode(host or "127.0.0.1", ssh_user, ssh_port, ssh_key, ssh_password)
+
+
+def get_node() -> Node:
+    """Get or create a cached Node instance based on config."""
+    config = get_config()
+    return connect_node(
+        config.host,
+        config.user,
+        config.port,
+        ssh_key=config.ssh_key,
+        ssh_password=config.password.get_secret_value() if config.password else None
+    )

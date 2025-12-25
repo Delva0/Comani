@@ -2,9 +2,7 @@
 
 name: "AniKawaXL Anime Girl"
 base_workflow: "anikawaxl.json"
-
-dependencies:
-  - "sdxl.sdxl.anikawaxl_v2"
+dependencies: ["sdxl.sdxl.anikawaxl_v2"]
 
 params:
   positive_prompt: "1girl, cute anime girl, blue eyes, blonde hair, smile, looking at viewer, masterpiece, best quality"

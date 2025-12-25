@@ -28,6 +28,7 @@ from comani.utils.download import (
     get_downloader,
 )
 
+
 # ============================================================================
 # Enums and Data Classes
 # ============================================================================
@@ -271,10 +272,6 @@ class ModelDownloader:
         print(f"\n{'=' * 60}")
         print(f"✅ {name} download complete!")
         print("=" * 60)
-
-    def close(self) -> None:
-        """Clean up resources."""
-        self._downloader.close()
 
     def __enter__(self) -> "ModelDownloader":
         # Trigger connection for remote downloaders

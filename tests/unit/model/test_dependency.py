@@ -190,11 +190,12 @@ mapping:
 """)
             yield preset_path
 
-    def test_preset_loads_list_dependencies(self, temp_preset_file):
+    def test_preset_loads_list_dependencies(self, temp_preset_file: Path):
         """Preset should load dependencies as a list."""
-        from comani.core.preset import Preset
+        from comani.core.preset import PresetManager
 
-        preset = Preset.from_yaml(temp_preset_file)
+        manager = PresetManager(temp_preset_file.parent)
+        preset = manager.get(temp_preset_file.stem)
 
         assert preset.name == "Test Preset"
         assert isinstance(preset.dependencies, list)

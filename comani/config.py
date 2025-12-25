@@ -14,9 +14,10 @@ class ComaniConfig(BaseSettings):
 
     # Remote Server Configuration (SSH)
     host: str = Field(default="127.0.0.1")
-    port: int = Field(default=22, validation_alias=AliasChoices("SSH_PORT", "COMANI_SSH_PORT", "port"))
-    user: str = Field(default="root", validation_alias=AliasChoices("SSH_USER", "COMANI_SSH_USER", "user"))
-    password: SecretStr | None = Field(default=None, validation_alias=AliasChoices("SSH_PASS", "COMANI_SSH_PASS", "password"))
+    port: int = Field(default=22, validation_alias=AliasChoices("COMANI_SSH_PORT", "SSH_PORT"))
+    user: str = Field(default="root", validation_alias=AliasChoices("COMANI_SSH_USER", "SSH_USER"))
+    password: SecretStr | None = Field(default=None, validation_alias=AliasChoices("COMANI_SSH_PASS", "SSH_PASS"))
+    ssh_key: str | None = Field(default=None, validation_alias=AliasChoices("COMANI_SSH_KEY", "SSH_KEY"))
 
     # ComfyUI Configuration
     comfyui_port: int = Field(default=8188)

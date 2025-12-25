@@ -1,10 +1,3 @@
-# Dev
-playground/
-codebase.md
-.cursor/
-.trae/
-.env
-
 # Python
 __pycache__/
 *.py[cod]
@@ -57,3 +50,15 @@ Thumbs.db
 *.pth
 *.gguf
 *.onnx
+.env
+
+# AI
+.cursor/
+# !.cursor/rules/
+.trae/*
+# !.trae/rules/
+GEMINI.md
+codebase.md
+
+# Temp
+playground/

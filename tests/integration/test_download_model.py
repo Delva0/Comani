@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from comani.model.model_pack import ModelPackRegistry  # noqa: E402
-from comani.model.download import ModelDownloader  # noqa: E402
+from comani.model.model_downloader import ModelDownloader  # noqa: E402
 from comani.config import get_config  # noqa: E402
 
 def download_anikawaxl_v2_with_cleanup():

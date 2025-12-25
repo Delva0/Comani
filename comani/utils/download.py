@@ -19,12 +19,11 @@ from typing import TYPE_CHECKING
 
 import requests
 from tqdm import tqdm
-from functools import lru_cache
 
-from comani.config import get_config
 import re
 from comani.utils.connection.ssh import is_remote_mode
-from comani.utils.connection.node import Node, connect_node
+from comani.utils.connection.node import Node
+from comani.utils.connection.node import get_node
 
 if TYPE_CHECKING:
     pass
@@ -260,16 +259,16 @@ class Aria2Downloader(BaseDownloader):
         return self.node.exec_shell(f'test -f "{path}"').ok
 
     def file_size(self, path: Path) -> int:
-        # # Check for .download meta file first
-        # meta_path = path.with_suffix(path.suffix + ".download")
-        # res = self.node.exec_shell(f'cat "{meta_path}" 2>/dev/null')
+        # aria2c doesn't provide a direct way to get file size,
+        # if we use stat command, it does not work.
+
+        # res = self.node.exec_shell(f'stat -c %s "{path}" 2>/dev/null')
         # if res.ok:
         #     try:
-        #         meta = json.loads(res.stdout)
-        #         return meta.get("existing_size", 0)
-        #     except Exception:
+        #         return int(res.stdout.strip())
+        #     except (ValueError, TypeError):
         #         pass
-        return 0  # TODO: Is there any other way to get file size downloaded by aria2c?
+        return 0    # TODO: Is there any other way to get file size downloaded by aria2c?
 
     def read_file_header(self, path: Path, size: int = 50) -> bytes:
         # Use dd to read first N bytes and base64 to transfer safely
@@ -531,23 +530,17 @@ class RequestsDownloader(BaseDownloader):
         return True
 
 
-@lru_cache(maxsize=1)
-def get_downloader() -> BaseDownloader:  # TODO: all downloader should handle clearing cache of this function when node is not available
+def get_downloader() -> BaseDownloader:
+    # TODO: all downloader should handle clearing cache of this function when node is not available
+    # 或者如果我们可以直接给node api 下层的ssh conn做连接池，那么可以在更底层实现cache，就不必这么乱了
     """
     Factory function to create appropriate downloader based on environment.
 
     Returns:
         Appropriate BaseDownloader subclass instance
     """
-    config = get_config()
-
-    node = connect_node(
-        config.host,
-        config.user,
-        config.port,
-        ssh_password=config.password.get_secret_value() if config.password else None
-    )
-    if node.exec_shell(["aria2c", "--version"]).ok:
+    node = get_node()
+    if node.exec_shell("aria2c --version").ok:
         return Aria2Downloader(node)
 
     if not is_remote_mode():

@@ -10,7 +10,7 @@ from comani.core.preset import PresetManager
 from comani.core.executor import WorkflowLoader, Executor
 from comani.model.model_dependency import DependencyResolver
 from comani.model.model_pack import ModelPackRegistry
-from comani.model.download import ModelDownloader
+from comani.model.model_downloader import ModelDownloader
 from comani.utils.download import get_downloader
 
 
@@ -27,7 +27,6 @@ class ComaniEngine:
         self.workflow_loader = WorkflowLoader(self.config.workflow_dir)
 
         # Initialize registry and dependency resolver
-        self._downloader = None
         self.model_pack_registry = ModelPackRegistry(self.config.model_dir)
         self.dependency_resolver = DependencyResolver(
             self.config.model_dir,
@@ -40,34 +39,15 @@ class ComaniEngine:
             self.dependency_resolver,
         )
 
-    def _create_downloader(self) -> ModelDownloader:
-        """Create a new ModelDownloader instance."""
-        inner_downloader = get_downloader()
-        # Model paths in YAML are relative to comfyui_root (e.g., "models/checkpoints/...")
-        downloader = ModelDownloader(inner_downloader, self.config.comfyui_root)
-        self.dependency_resolver.set_downloader(downloader)
-        return downloader
-
-    @property
-    def downloader(self) -> ModelDownloader:
-        """Get the singleton model downloader instance."""
-        if self._downloader is None:
-            self._downloader = self._create_downloader()
-            # Active downloader (connect if needed)
-            if hasattr(self._downloader, "__enter__"):
-                self._downloader.__enter__()
-        return self._downloader
-
     def download_models(self, targets: list[str], dry_run: bool = False) -> bool:
         """Download models specified by targets."""
-        return self.downloader.download_by_ids(targets, model_pack_registry=self.model_pack_registry, dry_run=dry_run)
+        from comani.model.model_downloader import ModelDownloader
+        dl = ModelDownloader(get_downloader(), self.config.comfyui_root)
+        return dl.download_by_ids(targets, model_pack_registry=self.model_pack_registry, dry_run=dry_run)
 
     def close(self) -> None:
-        """Cleanup resources including downloader."""
-        if self._downloader:
-            if hasattr(self._downloader, "__exit__"):
-                self._downloader.__exit__(None, None, None)
-            self._downloader = None
+        """Cleanup resources."""
+        pass
 
     def __del__(self):
         try:

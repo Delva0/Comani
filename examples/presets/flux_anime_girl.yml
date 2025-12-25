@@ -2,12 +2,7 @@
 
 name: "Flux Anime Girl"
 base_workflow: "flux_dev_example.json"
-
-dependencies:
-  - "flux1-schnell.safetensors"
-  - "ae.safetensors"
-  - "t5xxl_fp16.safetensors"
-  - "clip_l.safetensors"
+dependencies: ["flux1-schnell.safetensors", "ae.safetensors", "t5xxl_fp16.safetensors", "clip_l.safetensors"]
 
 params:
   positive_prompt: "cute anime girl with massive fluffy fennec ears, blonde messy long hair, blue eyes, maid outfit, 8k, masterpiece"
