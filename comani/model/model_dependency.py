@@ -7,6 +7,7 @@ Resolves dependencies using ModelPackRegistry with Python-like naming:
   - ["ref1", "ref2"] - multiple references
 """
 
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -42,6 +43,7 @@ class DependencyResolver:
         registry: ModelPackRegistry | None = None,
         downloader: ModelDownloader | None = None,
     ):
+        self.logger = logging.getLogger(__name__)
         if not model_config_dir and not registry:
             raise ValueError("Either model_config_dir or registry must be provided")
 
@@ -114,9 +116,11 @@ class DependencyResolver:
         Resolve and download all missing dependencies.
         Example: deps = resolver.ensure_dependencies(preset.dependencies)
         """
+        self.logger.debug("Resolving dependencies: %s", dependencies)
         resolved = self.resolve(dependencies)
 
         if not resolved:
+            self.logger.debug("No dependencies to resolve")
             return resolved
 
         if dry_run:
@@ -131,23 +135,31 @@ class DependencyResolver:
         node = get_node()
         comfyui_root = get_config().comfyui_root
 
+        self.logger.debug("Checking for missing models on node: %s", node.host if hasattr(node, 'host') else 'local')
         missing_models = []
         for dep in resolved:
             if not dep.model_def:
                 continue
             full_path = comfyui_root / dep.model_def.path
+            self.logger.debug("Checking model: %s at %s", dep.model_def.id, full_path)
             if not node.exists(str(full_path)):
+                self.logger.debug("Model missing: %s", dep.model_def.id)
                 missing_models.append(dep.model_def.id)
+            else:
+                self.logger.debug("Model exists: %s", dep.model_def.id)
 
         if not missing_models:
+            self.logger.debug("All models exist, skipping download")
             # All models exist, no need to initialize downloader
             return resolved
 
+        self.logger.debug("Downloading %d missing models", len(missing_models))
         downloader = self._get_downloader()
         downloader.download_by_ids(
             missing_models,
             model_pack_registry=self.registry
         )
+        self.logger.debug("Model download completed")
 
         return resolved
 

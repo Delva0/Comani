@@ -30,6 +30,7 @@ class ComaniConfig(BaseSettings):
     model_dir: Path | None = Field(default=examples_dir / "models", validation_alias=AliasChoices("COMANI_MODEL_DIR", "model_dir"))
     workflow_dir: Path | None = Field(default=examples_dir / "workflows", validation_alias=AliasChoices("COMANI_WORKFLOW_DIR", "workflow_dir"))
     preset_dir: Path | None = Field(default=examples_dir / "presets", validation_alias=AliasChoices("COMANI_PRESET_DIR", "preset_dir"))
+    output_dir: Path = Field(default=Path.cwd() / "outputs", validation_alias=AliasChoices("COMANI_OUTPUT_DIR", "output_dir"))
 
     # API Keys (No COMANI_ prefix in env usually, but we support both)
     xai_api_key: SecretStr | None = Field(default=None, validation_alias=AliasChoices("XAI_API_KEY", "COMANI_XAI_API_KEY"))

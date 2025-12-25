@@ -3,6 +3,7 @@ Workflow executor - load workflow, apply preset params, execute via client.
 """
 
 import copy
+import logging
 from typing import Any
 
 from comani.core.client import ComfyUIClient, ComfyUIResult
@@ -45,14 +46,10 @@ class Executor:
     def __init__(
         self,
         client: ComfyUIClient,
-        workflow_loader: WorkflowLoader,
-        preset_manager: PresetManager,
         dependency_resolver: DependencyResolver | None = None,
     ):
+        self.logger = logging.getLogger(__name__)
         self.client = client
-        self.workflow_loader = workflow_loader
-        self.workflow_loader.client = client
-        self.preset_manager = preset_manager
         self.dependency_resolver = dependency_resolver
 
     def apply_preset(self, workflow: dict[str, Any], preset: Preset) -> dict[str, Any]:
@@ -66,17 +63,18 @@ class Executor:
             if param_name not in preset.mapping:
                 continue
 
-            mapping = preset.mapping[param_name]
-            node_id = mapping.node_id
+            mappings = preset.mapping[param_name]
+            for mapping in mappings:
+                node_id = mapping.node_id
 
-            if node_id not in workflow:
-                continue
+                if node_id not in workflow:
+                    continue
 
-            node = workflow[node_id]
-            try:
-                set_nested_value(node, mapping.field_path, value)
-            except (KeyError, IndexError, TypeError) as e:
-                print(f"Warning: Failed to set {param_name}: {e}")
+                node = workflow[node_id]
+                try:
+                    set_nested_value(node, mapping.field_path, value)
+                except (KeyError, IndexError, TypeError) as e:
+                    print(f"Warning: Failed to set {param_name} on node {node_id}: {e}")
 
         return workflow
 
@@ -94,53 +92,83 @@ class Executor:
         except DependencyError as e:
             raise RuntimeError(f"Dependency error for preset '{preset.name}': {e}")
 
-    def execute_preset(
-        self,
-        preset_name: str,
-        param_overrides: dict[str, Any] | None = None,
-    ) -> ComfyUIResult:
-        """
-        Load preset, apply to workflow, and execute.
-        Example: result = executor.execute_preset("cyberpunk_city", {"seed": 42})
-        """
-        preset = self.preset_manager.get(preset_name)
-
-        if param_overrides:
-            preset.params.update(param_overrides)
-
-        # Ensure dependencies are available
-        self._ensure_dependencies(preset)
-
-        workflow = self.workflow_loader.load(preset.base_workflow)
-
-        if "nodes" in workflow:
-            workflow = self.workflow_loader.convert_to_api_format(workflow)
-
-        workflow = self.apply_preset(workflow, preset)
-
-        return self.client.execute(workflow)
-
     def execute_workflow(
         self,
-        workflow_name: str,
-        preset_data: dict[str, Any] | None = None,
+        workflow: dict[str, Any] | None = None,
+        preset: dict[str, Any] | Preset | None = None,
+        progress_callback: Any | None = None,
     ) -> ComfyUIResult:
         """
-        Execute workflow directly with optional inline preset data.
-        Example: result = executor.execute_workflow("flux_dev", {"params": {...}, "mapping": {...}})
+        Execute workflow with optional preset.
+        If workflow is provided, it overrides the workflow in the preset.
         """
-        workflow = self.workflow_loader.load(workflow_name)
+        # 1. Resolve Preset
+        preset_obj = None
+        if preset is not None:
+            if isinstance(preset, Preset):
+                preset_obj = preset
+            else:
+                preset_data = copy.deepcopy(preset)
+                # Ensure workflow key exists for Preset.from_dict if not present
+                if "workflow" not in preset_data:
+                    preset_data["workflow"] = "provided_workflow"
+                preset_obj = Preset.from_dict(preset_data)
 
-        if "nodes" in workflow:
-            workflow = self.workflow_loader.convert_to_api_format(workflow)
+        # 2. Resolve Workflow
+        final_workflow = None
+        if workflow is not None:
+            final_workflow = copy.deepcopy(workflow)
+        elif preset_obj is not None:
+            # We can't load workflow by name here because we don't have a loader
+            # So preset_obj.workflow name is useless here unless final_workflow is provided
+            raise ValueError("workflow dict must be provided in execute_workflow")
+        else:
+            raise ValueError("Either workflow or preset must be provided")
 
-        if preset_data:
-            preset_data["base_workflow"] = workflow_name
-            preset = Preset.from_dict(preset_data)
-            workflow = self.apply_preset(workflow, preset)
+        # 4. Apply preset if provided
+        if preset_obj:
+            self._ensure_dependencies(preset_obj)
+            final_workflow = self.apply_preset(final_workflow, preset_obj)
 
-        return self.client.execute(workflow)
+        return self.client.execute(final_workflow, progress_callback=progress_callback)
 
-    def execute_raw(self, workflow: dict[str, Any]) -> ComfyUIResult:
-        """Execute raw workflow directly."""
-        return self.client.execute(workflow)
+    def execute_workflow_by_name(
+        self,
+        workflow_name: str | None = None,
+        preset_name: str | None = None,
+        param_overrides: dict[str, Any] | None = None,
+        workflow_loader: WorkflowLoader | None = None,
+        preset_manager: PresetManager | None = None,
+        progress_callback: Any | None = None,
+    ) -> ComfyUIResult:
+        """
+        Execute workflow and optional preset by their names.
+        If workflow_name is provided, it overrides the workflow in the preset.
+        """
+        if workflow_loader is None:
+            raise ValueError("workflow_loader is required")
+
+        preset_obj = None
+        if preset_name:
+            if preset_manager is None:
+                raise ValueError("preset_manager is required when preset_name is provided")
+            preset_obj = preset_manager.get(preset_name)
+            if param_overrides:
+                preset_obj = copy.deepcopy(preset_obj)
+                preset_obj.params.update(param_overrides)
+
+        final_workflow_name = workflow_name
+        if final_workflow_name is None:
+            if preset_obj is None:
+                raise ValueError("Either workflow_name or preset_name must be provided")
+            final_workflow_name = preset_obj.workflow
+
+        workflow_dict = workflow_loader.load(final_workflow_name)
+        if "nodes" in workflow_dict:
+            workflow_dict = workflow_loader.convert_to_api_format(workflow_dict)
+
+        return self.execute_workflow(
+            workflow=workflow_dict,
+            preset=preset_obj,
+            progress_callback=progress_callback,
+        )

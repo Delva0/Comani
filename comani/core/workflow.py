@@ -27,11 +27,16 @@ class WorkflowLoader:
     def load(self, name: str, reload: bool = False) -> dict[str, Any]:
         """Load workflow by name."""
         if name not in self._cache or reload:
-            path = self.workflow_dir / f"{name}.json"
+            # 1. Try as direct path (absolute or relative to CWD)
+            path = Path(name)
             if not path.exists():
-                path = self.workflow_dir / name
+                # 2. Try relative to workflow_dir with .json
+                path = self.workflow_dir / f"{name}.json"
                 if not path.exists():
-                    raise FileNotFoundError(f"Workflow not found: {name}")
+                    # 3. Try relative to workflow_dir as is
+                    path = self.workflow_dir / name
+                    if not path.exists():
+                        raise FileNotFoundError(f"Workflow not found: {name}")
 
             with open(path, encoding="utf-8") as f:
                 self._cache[name] = json.load(f)

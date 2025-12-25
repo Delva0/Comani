@@ -1,33 +1,30 @@
 # Preset for cyberpunk city generation
 
 name: "Cyberpunk City"
-base_workflow: "flux_dev_example.json"
-dependencies: ["flux1-schnell.safetensors", "ae.safetensors"]
+workflow: "flux_dev_example.json"
+dependencies:
+  - "flux1-schnell.safetensors"
+  - "ae.safetensors"
 
 params:
   positive_prompt: "cyberpunk city, neon lights, rain, night scene, 8k, masterpiece, highly detailed"
-  seed: 123456789
   steps: 25
   width: 1920
   height: 1080
   guidance: 4.0
 
+nodes:
+  - prompt: 6
+  - noise: 25
+  - scheduler: 17
+  - width: 34
+  - height: 35
+  - guidance: 26
+
 mapping:
-  positive_prompt:
-    node_id: "6"
-    field_path: "inputs.text"
-  seed:
-    node_id: "25"
-    field_path: "inputs.noise_seed"
-  steps:
-    node_id: "17"
-    field_path: "inputs.steps"
-  width:
-    node_id: "34"
-    field_path: "inputs.value"
-  height:
-    node_id: "35"
-    field_path: "inputs.value"
-  guidance:
-    node_id: "26"
-    field_path: "inputs.guidance"
+  positive_prompt: "prompt:inputs.text"
+  seed: "noise:inputs.noise_seed"
+  steps: "scheduler:inputs.steps"
+  width: "width:inputs.value"
+  height: "height:inputs.value"
+  guidance: "guidance:inputs.guidance"

@@ -15,7 +15,7 @@ class TestComaniEngine:
         """Test engine initialization and components."""
         config = ComaniConfig(host="test-host")
         engine = ComaniEngine(config)
-        
+
         assert engine.config == config
         mock_client.assert_called_once()
         mock_pres.assert_called_once()
@@ -29,22 +29,35 @@ class TestComaniEngine:
         """Test engine health check."""
         mock_client = mock_client_cls.return_value
         mock_client.health_check.return_value = True
-        
+
         engine = ComaniEngine()
         status = engine.health_check()
-        
+
         assert status["comfyui"] == "ok"
         mock_client.health_check.assert_called_once()
 
-    def test_close_handles_downloader(self):
-        """Test that close() cleans up the downloader."""
+    def test_close(self):
+        """Test engine cleanup."""
         engine = ComaniEngine()
-        mock_downloader = MagicMock()
-        # Mock __exit__ support
-        mock_downloader.__exit__ = MagicMock()
-        engine._downloader = mock_downloader
-        
         engine.close()
+        # No error should occur
+
+    def test_execute_workflow_by_name(self):
+        """Test execute_workflow_by_name in Engine."""
+        engine = ComaniEngine()
+        engine.executor = MagicMock()
         
-        assert engine._downloader is None
-        mock_downloader.__exit__.assert_called_once()
+        engine.execute_workflow_by_name(
+            workflow_name="test_wf",
+            preset_name="test_preset",
+            param_overrides={"p": 1}
+        )
+        
+        engine.executor.execute_workflow_by_name.assert_called_once_with(
+            workflow_name="test_wf",
+            preset_name="test_preset",
+            param_overrides={"p": 1},
+            workflow_loader=engine.workflow_loader,
+            preset_manager=engine.preset_manager,
+            progress_callback=None
+        )

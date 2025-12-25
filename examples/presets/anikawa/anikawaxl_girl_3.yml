@@ -1,0 +1,13 @@
+# Preset for anime girl using AniKawaXL
+
+bases: ["anikawaxl_girl.yml"]
+params:
+  positive_prompt: |
+    masterpiece, best quality, highres, detailed background, moe, very cute, kawaii, galgame style, visual novel aesthetic, 2010s anime style, old anime aesthetic, flat shading, simple highlights, soft lighting,
+    1girl, solo focus, loli, very young appearance, petite, flat chest, small breasts, pink hair, long hair, twintails, large eyes,
+    bloom, no panties,
+    vibrant color, bold, senren banka,
+    (posing:1.2), (idol:1.2), blush, speed lines,
+    bow, choker, cleavage, flower, flower choker, frilled skirt, frills, gloves,  hair bow, hair flower, hair ornament, holding, holding microphone, microphone, pink bow, pink choker, pink hair, pink ribbon, ribbon, skirt, solo, standing,  thighhighs, top of moe 2016, white gloves, white thighhighs, nfsw, uncensored, sweat, sweat drop, lights, stage, singing, waving, (see-through clothes), see-through skirt,
+    shirt, (ass through skirt, back through shirt:1.2),
+    from below, (1boy, sex, sex from behind:1.2), pussy juice, audience, vest, open vest, cropped vest, concert, trembling, nipples, breasts, nude, saliva, female ejaculation, pussy juice, female orgasm, full face blush, hetero, clothed male nude female,"

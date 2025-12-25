@@ -2,6 +2,7 @@
 Comani engine - main orchestrator for workflow execution.
 """
 
+import logging
 from typing import Any
 
 from comani.config import get_config, ComaniConfig
@@ -10,7 +11,6 @@ from comani.core.preset import PresetManager
 from comani.core.executor import WorkflowLoader, Executor
 from comani.model.model_dependency import DependencyResolver
 from comani.model.model_pack import ModelPackRegistry
-from comani.model.model_downloader import ModelDownloader
 from comani.utils.download import get_downloader
 
 
@@ -21,6 +21,7 @@ class ComaniEngine:
     """
 
     def __init__(self, config: ComaniConfig | None = None):
+        self.logger = logging.getLogger(__name__)
         self.config = config or get_config()
         self.client = ComfyUIClient(self.config.comfyui_url, auth=self.config.auth)
         self.preset_manager = PresetManager(self.config.preset_dir)
@@ -34,8 +35,6 @@ class ComaniEngine:
         )
         self.executor = Executor(
             self.client,
-            self.workflow_loader,
-            self.preset_manager,
             self.dependency_resolver,
         )
 
@@ -71,28 +70,35 @@ class ComaniEngine:
         """List all available workflows."""
         return self.workflow_loader.list_workflows()
 
-    def execute_preset(
-        self,
-        preset_name: str,
-        param_overrides: dict[str, Any] | None = None,
-    ) -> ComfyUIResult:
-        """
-        Execute a preset with optional parameter overrides.
-        Example: result = engine.execute_preset("cyberpunk_city", {"seed": 42})
-        """
-        return self.executor.execute_preset(preset_name, param_overrides)
-
     def execute_workflow(
         self,
-        workflow_name: str,
-        preset_data: dict[str, Any] | None = None,
+        workflow: dict[str, Any] | None = None,
+        preset: dict[str, Any] | None = None,
+        progress_callback: Any | None = None,
     ) -> ComfyUIResult:
-        """Execute a workflow with optional inline preset data."""
-        return self.executor.execute_workflow(workflow_name, preset_data)
+        """
+        Execute workflow with optional preset using raw dictionaries.
+        """
+        return self.executor.execute_workflow(workflow, preset, progress_callback=progress_callback)
 
-    def execute_raw(self, workflow: dict[str, Any]) -> ComfyUIResult:
-        """Execute raw workflow directly."""
-        return self.executor.execute_raw(workflow)
+    def execute_workflow_by_name(
+        self,
+        workflow_name: str | None = None,
+        preset_name: str | None = None,
+        param_overrides: dict[str, Any] | None = None,
+        progress_callback: Any | None = None,
+    ) -> ComfyUIResult:
+        """
+        Execute workflow and optional preset by their names.
+        """
+        return self.executor.execute_workflow_by_name(
+            workflow_name=workflow_name,
+            preset_name=preset_name,
+            param_overrides=param_overrides,
+            workflow_loader=self.workflow_loader,
+            preset_manager=self.preset_manager,
+            progress_callback=progress_callback,
+        )
 
     def interrupt(self) -> bool:
         """Interrupt current execution."""

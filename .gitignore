@@ -51,6 +51,7 @@ Thumbs.db
 *.gguf
 *.onnx
 .env
+outputs/
 
 # AI
 .cursor/

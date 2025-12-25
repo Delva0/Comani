@@ -20,7 +20,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 from typing import Any, Callable, Optional, Union
 
-from comani.utils.connection.ssh import SSHConnection
+from comani.utils.connection.ssh import SSHConnection, SSHConnectionManager
 from comani.config import get_config
 
 logger = logging.getLogger(__name__)
@@ -110,8 +110,16 @@ class LocalNode(Node):
 class RemoteNode(Node):
     def __init__(self, host: str, user: str, port: int, key_path: str = None, password: str = None):
         super().__init__(host)
-        self.conn = SSHConnection(host, port, user, key_path, password)
-        self.conn.connect()
+        # Request connection from Manager instead of instantiating directly
+        self.conn = SSHConnectionManager().get_connection(
+            host=host,
+            port=port,
+            user=user,
+            key_path=key_path,
+            password=password
+        )
+        # Environment initialization (mkdir) might have been done already due to connection reuse,
+        # but running mkdir -p again is safe and low overhead.
         self._tmp = "/tmp/comani_node_exec"
         self.conn.exec(f"mkdir -p {self._tmp}", check=False)
 
@@ -153,7 +161,11 @@ class RemoteNode(Node):
         return res.ok
 
     def close(self) -> None:
-        self.conn.close()
+        """
+        Finished with this Node instance.
+        NOTE: We do NOT close the underlying SSH connection because it might be shared via SSHConnectionManager.
+        """
+        pass
 
 def _gen_bootstrap(target: Union[str, Callable], args: tuple, kwargs: dict) -> str:
     p_data = base64.b64encode(pickle.dumps({'a': args, 'k': kwargs})).decode('ascii')
@@ -181,7 +193,7 @@ if __name__ == '__main__':
         sys.exit(1)
 """
 
-@lru_cache(maxsize=1)  # 如果paramiko提供了ssh复用+连接失败自动创建新ssh conn，那么这里不再需要缓存
+# @lru_cache(maxsize=1)  # No longer needed as SSHConnectionManager handles reuse
 def connect_node(
     host: str = None,
     ssh_user: str = "root",
@@ -194,10 +206,9 @@ def connect_node(
     is_local_host = not host or host.lower() in ("localhost", "127.0.0.1")
 
     if is_local_host and not force_ssh:
-        logger.debug("Connecting to LocalNode")
         return LocalNode()
 
-    logger.debug(f"Connecting to RemoteNode: {host}")
+    # Instantiate RemoteNode directly, it will automatically reuse connection via Manager
     return RemoteNode(host or "127.0.0.1", ssh_user, ssh_port, ssh_key, ssh_password)
 
 

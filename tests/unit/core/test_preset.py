@@ -9,7 +9,7 @@ class TestPreset:
         """Test creating preset from dictionary."""
         data = {
             "name": "test-preset",
-            "base_workflow": "test-wf",
+            "workflow": "test-wf",
             "params": {"p1": "v1"},
             "mapping": {
                 "p1": {"node_id": "10", "field_path": "inputs.text"}
@@ -17,25 +17,43 @@ class TestPreset:
         }
         preset = Preset.from_dict(data)
         assert preset.name == "test-preset"
-        assert preset.base_workflow == "test-wf"
+        assert preset.workflow == "test-wf"
         assert preset.params == {"p1": "v1"}
-        assert preset.mapping["p1"].node_id == "10"
-        assert preset.mapping["p1"].field_path == "inputs.text"
+        assert preset.mapping["p1"][0].node_id == "10"
+        assert preset.mapping["p1"][0].field_path == "inputs.text"
 
     def test_from_dict_with_objects(self):
         """Test from_dict with already instantiated ParamMapping objects."""
-        mapping = {"p1": ParamMapping(node_id="1", field_path="path")}
+        mapping = {"p1": [ParamMapping(node_id="1", field_path="path")]}
         data = {
             "name": "test",
-            "base_workflow": "wf",
+            "workflow": "wf",
             "mapping": mapping
         }
         preset = Preset.from_dict(data)
-        assert preset.mapping["p1"] is mapping["p1"]
+        assert preset.mapping["p1"] == mapping["p1"]
+
+    def test_from_dict_string_mapping(self):
+        """Test from_dict with string mapping format 'node:field'."""
+        data = {
+            "name": "test",
+            "workflow": "wf",
+            "mapping": {
+                "p1": "10:inputs.text",
+                "p2": ["20:field1", "30:field2"]
+            }
+        }
+        preset = Preset.from_dict(data)
+        assert preset.mapping["p1"][0].node_id == "10"
+        assert preset.mapping["p1"][0].field_path == "inputs.text"
+        assert preset.mapping["p2"][0].node_id == "20"
+        assert preset.mapping["p2"][0].field_path == "field1"
+        assert preset.mapping["p2"][1].node_id == "30"
+        assert preset.mapping["p2"][1].field_path == "field2"
 
     def test_from_dict_missing_workflow(self):
-        """Test that from_dict raises error if base_workflow is missing."""
-        with pytest.raises(ValueError, match="base_workflow is required"):
+        """Test that from_dict raises error if workflow is missing."""
+        with pytest.raises(ValueError, match="workflow is required"):
             Preset.from_dict({"name": "test"})
 
 class TestPresetManager:
@@ -44,8 +62,8 @@ class TestPresetManager:
     def test_list_presets(self, tmp_path):
         """Test listing presets from directory."""
         # Create dummy preset files
-        (tmp_path / "p1.yml").write_text("base_workflow: wf1")
-        (tmp_path / "p2.yaml").write_text("base_workflow: wf2")
+        (tmp_path / "p1.yml").write_text("workflow: wf1")
+        (tmp_path / "p2.yaml").write_text("workflow: wf2")
         (tmp_path / "not_a_preset.txt").write_text("ignore me")
 
         manager = PresetManager(tmp_path)
@@ -57,7 +75,7 @@ class TestPresetManager:
         path = tmp_path / "test.yml"
         data = {
             "name": "test",
-            "base_workflow": "wf",
+            "workflow": "wf",
             "params": {"a": 1},
             "mapping": {"a": {"node_id": 1, "field_path": "x"}}
         }
@@ -75,7 +93,7 @@ class TestPresetManager:
     def test_inheritance_single(self, tmp_path):
         """Test single inheritance level."""
         (tmp_path / "base.yml").write_text(yaml.dump({
-            "base_workflow": "base_wf",
+            "workflow": "base_wf",
             "params": {"a": 1, "b": 2},
             "dependencies": ["d1"]
         }))
@@ -88,19 +106,19 @@ class TestPresetManager:
         manager = PresetManager(tmp_path)
         child = manager.get("child.yml")
 
-        assert child.base_workflow == "base_wf"
+        assert child.workflow == "base_wf"
         assert child.params == {"a": 1, "b": 3, "c": 4}
         assert child.dependencies == ["d1", "d2"]
 
     def test_inheritance_multiple(self, tmp_path):
         """Test multiple inheritance (bases: [A, B])."""
         (tmp_path / "base_a.yml").write_text(yaml.dump({
-            "base_workflow": "wf_a",
+            "workflow": "wf_a",
             "params": {"a": 1, "shared": "a"},
             "dependencies": ["dep_a"]
         }))
         (tmp_path / "base_b.yml").write_text(yaml.dump({
-            "base_workflow": "wf_b",
+            "workflow": "wf_b",
             "params": {"b": 2, "shared": "b"},
             "dependencies": ["dep_b"]
         }))
@@ -113,14 +131,14 @@ class TestPresetManager:
         child = manager.get("child.yml")
 
         # Last base (base_b) should override previous (base_a)
-        assert child.base_workflow == "wf_b"
+        assert child.workflow == "wf_b"
         assert child.params == {"a": 1, "b": 2, "shared": "b", "c": 3}
         assert child.dependencies == ["dep_a", "dep_b"]
 
     def test_inheritance_nested(self, tmp_path):
         """Test deep inheritance (A -> B -> C)."""
         (tmp_path / "grandparent.yml").write_text(yaml.dump({
-            "base_workflow": "wf",
+            "workflow": "wf",
             "params": {"p": "gp"}
         }))
         (tmp_path / "parent.yml").write_text(yaml.dump({
@@ -139,8 +157,8 @@ class TestPresetManager:
 
     def test_circular_dependency(self, tmp_path):
         """Test that circular dependencies raise RecursionError."""
-        (tmp_path / "a.yml").write_text("bases: [b.yml]\nbase_workflow: wf")
-        (tmp_path / "b.yml").write_text("bases: [a.yml]\nbase_workflow: wf")
+        (tmp_path / "a.yml").write_text("bases: [b.yml]\nworkflow: wf")
+        (tmp_path / "b.yml").write_text("bases: [a.yml]\nworkflow: wf")
 
         manager = PresetManager(tmp_path)
         with pytest.raises(RecursionError, match="Circular dependency detected"):
@@ -149,7 +167,7 @@ class TestPresetManager:
     def test_list_deduplication(self, tmp_path):
         """Test that list fields (dependencies) are deduplicated while keeping order."""
         (tmp_path / "base.yml").write_text(yaml.dump({
-            "base_workflow": "wf",
+            "workflow": "wf",
             "dependencies": ["a", "b", "c"]
         }))
         (tmp_path / "child.yml").write_text(yaml.dump({
@@ -166,7 +184,7 @@ class TestPresetManager:
     def test_mapping_override(self, tmp_path):
         """Test that mapping dictionaries are merged correctly."""
         (tmp_path / "base.yml").write_text(yaml.dump({
-            "base_workflow": "wf",
+            "workflow": "wf",
             "mapping": {
                 "p1": {"node_id": "1", "field_path": "f1"},
                 "p2": {"node_id": "2", "field_path": "f2"}
@@ -182,14 +200,14 @@ class TestPresetManager:
 
         manager = PresetManager(tmp_path)
         child = manager.get("child.yml")
-        assert child.mapping["p1"].node_id == "1"
-        assert child.mapping["p2"].node_id == "22"
-        assert child.mapping["p3"].node_id == "3"
+        assert child.mapping["p1"][0].node_id == "1"
+        assert child.mapping["p2"][0].node_id == "22"
+        assert child.mapping["p3"][0].node_id == "3"
 
     def test_inheritance_with_extension(self, tmp_path):
         """Test inheritance when base name includes .yml extension."""
         (tmp_path / "base.yml").write_text(yaml.dump({
-            "base_workflow": "base_wf",
+            "workflow": "base_wf",
             "params": {"a": 1}
         }))
         (tmp_path / "child.yml").write_text(yaml.dump({
@@ -200,18 +218,18 @@ class TestPresetManager:
         manager = PresetManager(tmp_path)
         child = manager.get("child.yml")
         assert child.params == {"a": 1, "b": 2}
-        assert child.base_workflow == "base_wf"
+        assert child.workflow == "base_wf"
 
     def test_missing_base_raises_error(self, tmp_path):
         """Test that missing parent preset raises FileNotFoundError."""
-        (tmp_path / "child.yml").write_text("bases: [nonexistent.yml]\nbase_workflow: wf")
+        (tmp_path / "child.yml").write_text("bases: [nonexistent.yml]\nworkflow: wf")
         manager = PresetManager(tmp_path)
         with pytest.raises(FileNotFoundError, match="Preset 'nonexistent.yml' not found"):
             manager.get("child.yml")
 
     def test_default_name_from_filename(self, tmp_path):
         """Test that name defaults to filename if not provided in YAML."""
-        (tmp_path / "no_name.yml").write_text("base_workflow: wf")
+        (tmp_path / "no_name.yml").write_text("workflow: wf")
         manager = PresetManager(tmp_path)
         preset = manager.get("no_name.yml")
         assert preset.name == "no_name.yml"
@@ -225,7 +243,7 @@ class TestPresetManager:
 
         # 1. folder1/anikawaxl_girl_2.yml inherits anikawaxl_girl.yml
         (tmp_path / "anikawaxl_girl.yml").write_text(yaml.dump({
-            "base_workflow": "base_wf",
+            "workflow": "base_wf",
             "params": {"v1": 1, "v2": 1, "v3": 1}
         }))
 
@@ -248,7 +266,7 @@ class TestPresetManager:
         assert p3.params["v1"] == 1  # From root
         assert p3.params["v2"] == 2  # Overwritten by 2
         assert p3.params["v3"] == 3  # Overwritten by 3
-        assert p3.base_workflow == "base_wf"
+        assert p3.workflow == "base_wf"
         assert p3.name == "folder2/anikawaxl_girl_3.yml"
 
     def test_inheritance_relative_no_prefix(self, tmp_path):
@@ -256,7 +274,7 @@ class TestPresetManager:
         sub = tmp_path / "sub"
         sub.mkdir()
         (sub / "base.yml").write_text(yaml.dump({
-            "base_workflow": "wf",
+            "workflow": "wf",
             "params": {"a": 1}
         }))
         (sub / "child.yml").write_text(yaml.dump({
@@ -272,13 +290,13 @@ class TestPresetManager:
     def test_inheritance_priority(self, tmp_path):
         """Test that context_dir has priority over preset_dir."""
         (tmp_path / "base.yml").write_text(yaml.dump({
-            "base_workflow": "wf",
+            "workflow": "wf",
             "params": {"location": "global"}
         }))
         sub = tmp_path / "sub"
         sub.mkdir()
         (sub / "base.yml").write_text(yaml.dump({
-            "base_workflow": "wf",
+            "workflow": "wf",
             "params": {"location": "local"}
         }))
         (sub / "child.yml").write_text(yaml.dump({
@@ -295,7 +313,7 @@ class TestPresetManager:
         sub = tmp_path / "sub"
         sub.mkdir()
         (sub / "base.yml").write_text(yaml.dump({
-            "base_workflow": "wf",
+            "workflow": "wf",
             "params": {"a": 1}
         }))
         (sub / "child.yml").write_text(yaml.dump({
@@ -310,7 +328,7 @@ class TestPresetManager:
     def test_inheritance_relative_dot_dot_slash(self, tmp_path):
         """Test inheritance using ../ relative path."""
         (tmp_path / "base.yml").write_text(yaml.dump({
-            "base_workflow": "wf",
+            "workflow": "wf",
             "params": {"a": 1}
         }))
         sub = tmp_path / "sub"

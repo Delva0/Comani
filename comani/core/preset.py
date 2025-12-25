@@ -21,30 +21,64 @@ class ParamMapping:
 class Preset:
     """Workflow preset configuration."""
     name: str
-    base_workflow: str
+    workflow: str
     params: dict[str, Any] = field(default_factory=dict)
-    mapping: dict[str, ParamMapping] = field(default_factory=dict)
+    mapping: dict[str, list[ParamMapping]] = field(default_factory=dict)
     dependencies: list[str] = field(default_factory=list)
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Preset":
         """Load preset from dictionary."""
+        # Parse nodes alias map
+        node_alias_map = {}
+        nodes_data = data.get("nodes", [])
+        if isinstance(nodes_data, list):
+            for node_item in nodes_data:
+                if isinstance(node_item, dict):
+                    for alias, node_id in node_item.items():
+                        node_alias_map[str(alias)] = str(node_id)
+
         mapping = {}
         for param_name, mapping_data in data.get("mapping", {}).items():
-            if isinstance(mapping_data, ParamMapping):
-                mapping[param_name] = mapping_data
+            mappings_list = []
+            if isinstance(mapping_data, list):
+                raw_mappings = mapping_data
             else:
-                mapping[param_name] = ParamMapping(
-                    node_id=str(mapping_data["node_id"]),
-                    field_path=mapping_data["field_path"],
-                )
+                raw_mappings = [mapping_data]
 
-        if "base_workflow" not in data:
-            raise ValueError("base_workflow is required in preset")
+            for item in raw_mappings:
+                if isinstance(item, ParamMapping):
+                    mappings_list.append(item)
+                elif isinstance(item, dict):
+                    node_key = item.get("node_id") or item.get("node")
+                    field_path = item.get("field_path")
+                    if node_key is not None and field_path is not None:
+                        node_id = node_alias_map.get(str(node_key), str(node_key))
+                        mappings_list.append(ParamMapping(
+                            node_id=node_id,
+                            field_path=field_path,
+                        ))
+                elif isinstance(item, str) and ":" in item:
+                    parts = item.split(":", 1)
+                    node_key = parts[0]
+                    field_path = parts[1]
+
+                    # Resolve alias if exists, otherwise use as node_id
+                    # Ensure node_key is string for lookup
+                    node_id = node_alias_map.get(str(node_key), str(node_key))
+
+                    mappings_list.append(ParamMapping(
+                        node_id=node_id,
+                        field_path=field_path,
+                    ))
+            mapping[param_name] = mappings_list
+
+        if "workflow" not in data:
+            raise ValueError("workflow is required")
 
         return cls(
             name=data.get("name", "anonymous"),
-            base_workflow=data["base_workflow"],
+            workflow=data["workflow"],
             params=data.get("params", {}),
             mapping=mapping,
             dependencies=data.get("dependencies", []),
@@ -118,10 +152,20 @@ class PresetManager:
         for k, v in override.items():
             if k in ("params", "mapping") and isinstance(v, dict):
                 result.setdefault(k, {}).update(v)
-            elif k == "dependencies" and isinstance(v, list):
+            elif k == "dependencies" and isinstance(v, list | str):
+                # Convert single string to list
+                if isinstance(v, str):
+                    v = [v]
                 # Append and deduplicate list while maintaining order
                 existing = result.get(k, [])
                 result[k] = list(dict.fromkeys(existing + v))
+            elif k == "nodes" and isinstance(v, list | str):
+                # Convert single string to list
+                if isinstance(v, str):
+                    v = [v]
+                # Append nodes list
+                existing = result.get(k, [])
+                result[k] = existing + v
             else:
                 # Scalar overwrite
                 result[k] = v
@@ -129,13 +173,11 @@ class PresetManager:
 
     def _load_raw_yaml(self, name: str, context_dir: Path | None = None) -> tuple[dict, Path]:
         """Load raw YAML content from disk."""
-        # 1. Try absolute path
+        # 1. Try as absolute or relative path from CWD
         p = Path(name)
-        if p.is_absolute():
-            if p.exists():
-                with open(p, encoding="utf-8") as f:
-                    return yaml.safe_load(f) or {}, p
-            raise FileNotFoundError(f"Preset absolute path '{name}' not found")
+        if p.exists():
+            with open(p, encoding="utf-8") as f:
+                return yaml.safe_load(f) or {}, p.resolve()
 
         # 2. Try relative path from context_dir (priority 1)
         if context_dir:
@@ -148,13 +190,14 @@ class PresetManager:
         p = self.preset_dir / name
         if p.exists():
             with open(p, encoding="utf-8") as f:
-                return yaml.safe_load(f) or {}, p
+                return yaml.safe_load(f) or {}, p.resolve()
 
         search_dirs = []
         if context_dir:
             search_dirs.append(str(context_dir))
         search_dirs.append(str(self.preset_dir))
-        raise FileNotFoundError(f"Preset '{name}' not found (searched in: {', '.join(search_dirs)})")
+        search_dirs_str = ', '.join(search_dirs)
+        raise FileNotFoundError(f"Preset '{name}' not found (searched in: '{search_dirs_str}')")
 
     def reload_all(self) -> None:
         """Reload all presets from disk."""

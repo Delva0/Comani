@@ -1,5 +1,3 @@
-# Preset for anime girl using AniKawaXL
-
-bases: ["anikawaxl_girl.yml"]
+bases: "anikawaxl_girl.yml"
 params:
   positive_prompt: "1girl, white hair, blue dress"

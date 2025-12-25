@@ -174,7 +174,7 @@ class TestPresetIntegration:
             preset_path = Path(tmpdir) / "test_preset.yml"
             preset_path.write_text("""
 name: "Test Preset"
-base_workflow: "test.json"
+workflow: "test.json"
 
 dependencies:
   - "sdxl.sdxl.anikawaxl_v2"
@@ -195,7 +195,7 @@ mapping:
         from comani.core.preset import PresetManager
 
         manager = PresetManager(temp_preset_file.parent)
-        preset = manager.get(temp_preset_file.stem)
+        preset = manager.get(temp_preset_file.name)
 
         assert preset.name == "Test Preset"
         assert isinstance(preset.dependencies, list)

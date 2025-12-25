@@ -1,6 +1,7 @@
 import os
 import tempfile
 import logging
+import pytest
 from comani.utils.connection.node import connect_node
 
 logging.basicConfig(level=logging.DEBUG)
@@ -50,16 +51,14 @@ def verify_node_functionality(node, name):
 
     print(f"--- Node {name} passed all tests! ---\n")
 
-if __name__ == "__main__":
-    # 0. Test LocalNode
+def test_local_node():
+    """Test LocalNode functionality."""
     print("Starting LocalNode test...")
-    try:
-        with connect_node(host=None) as node:
-            verify_node_functionality(node, "local_node")
-    except Exception as e:
-        print(f"LocalNode test failed: {e}")
+    with connect_node(host=None) as node:
+        verify_node_functionality(node, "local_node")
 
-    # 1. Test localhost with SSH (using password)
+def test_localhost_ssh():
+    """Test localhost SSH functionality."""
     print("\nStarting localhost (SSH) test...")
     try:
         with connect_node(
@@ -70,10 +69,10 @@ if __name__ == "__main__":
         ) as node:
             verify_node_functionality(node, "localhost_ssh")
     except Exception as e:
-        print(f"Localhost SSH test failed: {e}")
-        print("Note: This might fail if SSH server is not running on localhost.")
+        pytest.skip(f"Localhost SSH test failed: {e}. Note: This might fail if SSH server is not running on localhost.")
 
-    # 2. Test remote linux environment
+def test_remote_linux_vast_ai():
+    """Test remote linux environment (vast.ai)."""
     print("\nStarting remote linux test (vast.ai)...")
     try:
         with connect_node(
@@ -83,4 +82,5 @@ if __name__ == "__main__":
         ) as node:
             verify_node_functionality(node, "vast_ai")
     except Exception as e:
-        print(f"Vast.ai remote test failed: {e}")
+        pytest.skip(f"Vast.ai remote test failed: {e}")
+

@@ -12,6 +12,7 @@ import os
 import socket
 import select
 import threading
+import atexit
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -238,13 +239,20 @@ class SSHConnection:
 
     @property
     def is_connected(self) -> bool:
-        """Check if connected."""
-        return self._ssh is not None and self._ssh.get_transport() is not None
+        """Check if connected and transport is active."""
+        if self._ssh is None:
+            return False
+        transport = self._ssh.get_transport()
+        return transport is not None and transport.is_active()
 
     def connect(self) -> None:
-        """Establish SSH connection."""
-        if self._ssh is not None:
+        """Establish SSH connection or Re-connect if dead."""
+        if self.is_connected:
             return
+
+        # Clean up old dead connection
+        if self._ssh is not None:
+            self.close()
 
         import paramiko
 
@@ -367,6 +375,78 @@ class SSHConnection:
 
     def __exit__(self, *args) -> None:
         self.close()
+
+
+class SSHConnectionManager:
+    """
+    Global manager for SSH connections to ensure reuse.
+    Thread-safe singleton pattern.
+    """
+    _instance = None
+    _lock = threading.Lock()
+    _connections: dict[str, SSHConnection] = {}
+
+    def __new__(cls):
+        if cls._instance is None:
+            with cls._lock:
+                if cls._instance is None:
+                    cls._instance = super().__new__(cls)
+        return cls._instance
+
+    def get_connection(
+        self,
+        host: str,
+        port: int = 22,
+        user: str = "root",
+        key_path: str | None = None,
+        password: str | None = None,
+        timeout: int = 30,
+    ) -> SSHConnection:
+        """Get an existing active connection or create a new one."""
+        # Generate unique key including all authentication factors
+        conn_key = f"{user}@{host}:{port}"
+
+        with self._lock:
+            conn = self._connections.get(conn_key)
+
+            # 1. If connection exists and is active, return it
+            if conn and conn.is_connected:
+                return conn
+
+            # 2. If connection exists but is dead, try reconnecting
+            if conn and not conn.is_connected:
+                logger.info(f"SSH connection to {conn_key} is dead. Reconnecting...")
+                try:
+                    conn.connect()
+                    return conn
+                except Exception:
+                    # Reconnect failed, remove old object and prepare for new one
+                    self.close_connection(conn_key)
+
+            # 3. Create new connection
+            logger.debug(f"Creating new SSH connection for {conn_key}")
+            new_conn = SSHConnection(host, port, user, key_path, password, timeout)
+            new_conn.connect()
+            self._connections[conn_key] = new_conn
+            return new_conn
+
+    def close_connection(self, conn_key: str) -> None:
+        """Close and remove a specific connection."""
+        with self._lock:
+            if conn_key in self._connections:
+                conn = self._connections.pop(conn_key)
+                conn.close()
+
+    def close_all(self) -> None:
+        """Close all managed connections."""
+        with self._lock:
+            for conn in self._connections.values():
+                conn.close()
+            self._connections.clear()
+
+
+# Register cleanup on exit
+atexit.register(SSHConnectionManager().close_all)
 
 
 # Utility functions for remote file operations

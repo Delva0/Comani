@@ -10,12 +10,21 @@ Uses Python-like naming convention:
 from unittest.mock import patch, MagicMock
 from argparse import Namespace
 
-from comani.cli.commands import (
+import pytest
+
+from comani.cli.cmd_model import (
     cmd_model_list,
     cmd_model_download,
     _get_registry,
 )
 
+@pytest.fixture(autouse=True)
+def clear_config():
+    """Clear the cached config singleton before each test."""
+    import comani.config
+    comani.config._config = None
+    yield
+    comani.config._config = None
 
 class TestModelListCommand:
     """Tests for the model list command."""
@@ -135,25 +144,26 @@ class TestModelDownloadCommand:
 
     def test_download_uses_model_downloader(self, capsys, monkeypatch, tmp_path):
         """Test that download command uses ModelDownloader class."""
-        from comani.core.engine import ComaniEngine
+        from comani.model.model_downloader import ModelDownloader
 
         mock_downloader = MagicMock()
-        mock_downloader.__enter__ = MagicMock(return_value=mock_downloader)
-        mock_downloader.__exit__ = MagicMock(return_value=False)
+        mock_downloader.download_by_ids.return_value = True
 
-        # Mock ComaniEngine.downloader property instead of ModelDownloader.create
-        monkeypatch.setattr(ComaniEngine, "downloader", mock_downloader)
-        monkeypatch.setenv("COMANI_COMFYUI_DIR", str(tmp_path))
+        # Mock ModelDownloader in its home module
+        with patch("comani.model.model_downloader.ModelDownloader", return_value=mock_downloader):
+            # Also mock get_downloader to avoid connection attempts
+            with patch("comani.core.engine.get_downloader"):
+                monkeypatch.setenv("COMANI_COMFYUI_DIR", str(tmp_path))
 
-        args = Namespace(
-            targets=["detection"],
-            comfyui_root=str(tmp_path),
-            dry_run=False,
-        )
-        cmd_model_download(args)
+                args = Namespace(
+                    targets=[".detection"],
+                    comfyui_root=str(tmp_path),
+                    dry_run=False,
+                )
+                cmd_model_download(args)
 
-        # Should have called download_by_ids
-        mock_downloader.download_by_ids.assert_called_once()
+                # Should have called download_by_ids
+                mock_downloader.download_by_ids.assert_called_once()
 
 
 class TestGetRegistry:

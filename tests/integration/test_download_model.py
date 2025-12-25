@@ -1,3 +1,4 @@
+import pytest
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -7,11 +8,15 @@ from comani.model.model_pack import ModelPackRegistry  # noqa: E402
 from comani.model.model_downloader import ModelDownloader  # noqa: E402
 from comani.config import get_config  # noqa: E402
 
-def download_anikawaxl_v2_with_cleanup():
+def test_download_anikawaxl_v2_with_cleanup():
     """
     Functional test to download a specific model and then clean up.
     """
     config = get_config()
+
+    # Skip if no remote host is configured
+    if not config.host or config.host in ("localhost", "127.0.0.1"):
+        pytest.skip(f"COMANI_HOST ({config.host}) not set to a remote server, skipping real download model test")
 
     base_dir = Path(__file__).parent.parent.parent
     models_dir = base_dir / "examples/models"
@@ -45,6 +50,3 @@ def download_anikawaxl_v2_with_cleanup():
         still_exists = downloader._downloader.file_exists(target_path)
         assert not still_exists, f"❌ Cleanup failed: file still exists at {target_path}"
         print("✅ Cleanup successful")
-
-if __name__ == "__main__":
-    download_anikawaxl_v2_with_cleanup()

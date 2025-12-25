@@ -1,0 +1,11 @@
+bases: "anikawa/anikawaxl_5loras.yml"
+params:
+  positive_prompt: |
+    masterpiece, best quality, highres, detailed background, moe, very cute, kawaii, galgame style, visual novel aesthetic, 2010s anime style, old anime aesthetic, flat shading, simple highlights, soft lighting,
+    1girl, solo focus, loli, very young appearance, petite, flat chest, small breasts, pink hair, long hair, twintails, black ribbons, large eyes, heavy blush on face,
+    bloom, no panties,
+    vibrant color, bold, senren banka, blush,
+    (posing:1.2), (idol:1.2), smile, speed lines,
+    bow, choker, cleavage, cowboy shot, crop top, flower, flower choker, frilled skirt, frills, gloves, groin, hair bow, hair flower, hair ornament, holding, holding microphone, looking at viewer, microphone, miniskirt, navel, open mouth, pink bow, pink choker, pink hair, pink ribbon, ribbon, skirt, smile, solo, standing, no teeth, thighhighs, top of moe 2016, white gloves, white thighhighs, wind blowing, skirt lift, pussy, nfsw, uncensored, sweat, sweat drop, lights, stage, singing,
+    pussy spread, clitoris,
+    from below, (1boy, sex, sex from behind:1.2), pussy juice, audience, vest, open vest, cropped vest, concert, trembling, nipples, breasts, nude, saliva, female ejaculation, pussy juice, female orgasm, standing split,

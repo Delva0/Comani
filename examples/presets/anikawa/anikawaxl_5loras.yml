@@ -1,0 +1,77 @@
+name: "AniKawaXL with 5 LoRAs (Active Only)"
+dependencies:
+  - "sdxl.sdxl.anikawaxl_v2"
+  - "noob_vp1_detailer_by_volnovik_v1"
+  - "noobaivpred10insertion_vpred10v2"
+workflow: "anikawaxl_with_5_loras_new.json"
+
+params:
+  steps: 28
+  cfg: 7.0
+  width: 1024
+  height: 1536
+  # 活跃 LoRA 1 (Node 34)
+  lora_detailer_name: "NOOB_vp1_detailer_by_volnovik_v1.safetensors"
+  lora_detailer_strength: 1.5
+  # 活跃 LoRA 2 (Node 33)
+  lora_insertion_name: "NoobaiVpred10Insertion_vpred10V2.safetensors"
+  lora_insertion_strength: 2.0
+  empty_lora_name: "NOOB_vp1_detailer_by_volnovik_v1.safetensors"
+
+nodes:
+  - prompt_pos_primitive: 41
+  - prompt_neg_primitive: 42
+  - empty_latent: 35
+  - ksampler_smea: 31
+  - ksampler_euler_a: 32
+  - ksampler_dpm: 38
+  - lora_16: 16
+  - lora_17: 17
+  - lora_18: 18
+  - lora_19: 19
+  - lora_20: 20
+  - lora_28: 28
+  - lora_29: 29
+  - lora_30: 30
+  - lora_detailer: 34
+  - lora_insertion: 33
+
+mapping:
+  positive_prompt: "prompt_pos_primitive:inputs.value"
+  negative_prompt: "prompt_neg_primitive:inputs.value"
+  seed:
+    - "ksampler_smea:inputs.seed"
+    - "ksampler_euler_a:inputs.seed"
+    - "ksampler_dpm:inputs.seed"
+  steps:
+    - "ksampler_smea:inputs.steps"
+    - "ksampler_euler_a:inputs.steps"
+    - "ksampler_dpm:inputs.steps"
+  cfg:
+    - "ksampler_smea:inputs.cfg"
+    - "ksampler_euler_a:inputs.cfg"
+    - "ksampler_dpm:inputs.cfg"
+  width: "empty_latent:inputs.width"
+  height: "empty_latent:inputs.height"
+
+  # LoRA 1 Control
+  lora_detailer_name: "lora_detailer:inputs.lora_name"
+  lora_detailer_strength:
+    - "lora_detailer:inputs.strength_model"
+    - "lora_detailer:inputs.strength_clip"
+
+  # LoRA 2 Control
+  lora_insertion_name: "lora_insertion:inputs.lora_name"
+  lora_insertion_strength:
+    - "lora_insertion:inputs.strength_model"
+    - "lora_insertion:inputs.strength_clip"
+
+  empty_lora_name:
+    - "lora_16:inputs.lora_name"
+    - "lora_17:inputs.lora_name"
+    - "lora_18:inputs.lora_name"
+    - "lora_19:inputs.lora_name"
+    - "lora_20:inputs.lora_name"
+    - "lora_28:inputs.lora_name"
+    - "lora_29:inputs.lora_name"
+    - "lora_30:inputs.lora_name"
